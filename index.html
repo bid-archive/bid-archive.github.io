@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>bid.archive 성적표</title>
+<meta name="description" content="서울·경기·부산 아파트 경매 예상낙찰가와 실제 결과를 전부 공개하는 성적표">
+<meta property="og:title" content="bid.archive 경매 예상낙찰가 성적표">
+<meta property="og:description" content="매주 예상낙찰가를 먼저 공개하고, 결과까지 전부 남깁니다.">
+<meta property="og:image" content="112971-1.jpg">
+<style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* layout: 한 줄 기둥(최대 960px) — 성적 숫자 → 이번 주 예측 → 전체 기록 → 기준·안내. 경매 입찰표처럼 칸이 분명한 표 위주 */
+:root{
+  --paper:#F3F3EF; --card:#FFFFFF; --ink:#111111; --sub:#66665F; --line:#DEDED6;
+  --lime:#C6F432; --on-lime:#111111; --hit:#1F8A4C; --miss:#C2410C; --wait:#8C8C86;
+  --tile:#111111; --tile-fg:#F3F3EF;
+  --f-display:"Black Han Sans","Noto Sans KR",sans-serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#121211; --card:#1C1C1A; --ink:#F1F1EC; --sub:#A3A39D; --line:#2E2E2B;
+  --lime:#C6F432; --on-lime:#111111; --hit:#4ADE80; --miss:#FB923C; --wait:#8C8C86; --tile:#232321; --tile-fg:#F1F1EC; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121211; --card:#1C1C1A; --ink:#F1F1EC; --sub:#A3A39D; --line:#2E2E2B;
+  --lime:#C6F432; --on-lime:#111111; --hit:#4ADE80; --miss:#FB923C; --wait:#8C8C86; --tile:#232321; --tile-fg:#F1F1EC; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:960px;margin:0 auto;padding-block:20px 56px;display:flex;flex-direction:column;gap:40px}
+a{color:inherit}
+.num{font-family:var(--f-body);font-weight:700;font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mark{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px;letter-spacing:-.01em;text-decoration:none}
+.mark i{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--lime);font-style:normal;font-family:var(--f-display);font-size:15px}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--ink);font-weight:700;font-size:13px;text-decoration:none;background:transparent;color:var(--ink);cursor:pointer;font-family:inherit}
+.btn.fill{background:var(--lime);border-color:var(--lime);color:var(--on-lime)}
+.btn:focus-visible,.chip:focus-visible,summary:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+
+/* hero */
+.hero h1{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,7vw,58px);line-height:1.12;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.hero h1 em{font-style:normal;background:var(--lime);color:var(--on-lime);padding:0 .18em;border-radius:.12em}
+.hero p{margin:14px 0 0;color:var(--sub);max-width:60ch}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:26px}
+.stat{background:var(--tile);color:var(--tile-fg);border-radius:16px;padding:16px 18px;min-width:0}
+.stat .k{font-size:13px;font-weight:700;letter-spacing:.02em;opacity:.75}
+.stat .v{font-family:var(--f-display);font-weight:400;font-size:clamp(40px,8vw,56px);line-height:1.05;margin-top:8px;color:var(--lime);font-variant-numeric:tabular-nums}
+.stat .s{font-size:13px;opacity:.7;margin-top:4px}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* section heads */
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.sec-h h2{margin:0;font-size:22px;font-weight:900;letter-spacing:-.02em}
+.sec-h .note{color:var(--sub);font-size:13px}
+
+/* upcoming */
+.up{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.uc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.uc .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dday{font-family:var(--f-display);font-size:15px;background:var(--tile);color:var(--lime);padding:3px 10px;border-radius:999px}
+.case{font-size:12px;color:var(--sub)}
+.uc h3{margin:0;font-size:19px;font-weight:900;letter-spacing:-.02em}
+.uc .meta{font-size:13px;color:var(--sub)}
+.ladder{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ladder div{padding:10px 8px;text-align:center;border-left:1px solid var(--line)}
+.ladder div:first-child{border-left:none}
+.ladder .k{font-size:11px;color:var(--sub)}
+.ladder .v{font-family:var(--f-display);font-size:21px;line-height:1.3}
+.ladder .pick{background:var(--lime);color:var(--on-lime)}
+.ladder .pick .k{color:var(--on-lime);opacity:.75}
+.lock{filter:blur(6px);user-select:none}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.thumbs img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block}
+
+/* filters + table */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);font-family:inherit}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:15px}
+th,td{padding:15px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;color:var(--sub);font-weight:700;letter-spacing:.05em;background:var(--paper)}
+td b{font-size:16px;font-weight:900;letter-spacing:-.02em}
+td.big{font-family:var(--f-display);font-size:19px;font-weight:400}
+td.big.pk{color:var(--ink);background:color-mix(in srgb,var(--lime) 28%,transparent)}
+tr:last-child td{border-bottom:none}
+td.r,th.r{text-align:right}
+.pill{display:inline-block;font-size:13px;font-weight:900;padding:3px 12px;border-radius:999px;border:1.5px solid currentColor}
+.pill.hit{color:var(--hit)} .pill.miss{color:var(--miss)} .pill.wait{color:var(--wait)}
+.err{font-size:16px;font-weight:900}.err.pos{color:var(--miss)} .err.neg{color:var(--hit)}
+.empty{padding:28px;text-align:center;color:var(--sub)}
+
+/* rule + cta */
+.rule{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.rule div{border-top:3px solid var(--ink);padding-top:10px;min-width:0}
+.rule b{display:block;font-size:15px}
+.rule span{font-size:13px;color:var(--sub)}
+@media (max-width:640px){.rule{grid-template-columns:1fr}}
+.cta{background:var(--tile);color:var(--tile-fg);border-radius:22px;padding:26px 24px;display:flex;flex-direction:column;gap:14px}
+.cta h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(24px,4.6vw,34px);line-height:1.2}
+.cta h2 em{font-style:normal;color:var(--lime)}
+.cta .btn{border-color:var(--tile-fg);color:var(--tile-fg)}
+.cta .btn.fill{color:var(--on-lime);border-color:var(--lime)}
+.cta p{margin:0;font-size:13px;opacity:.7}
+footer{font-size:12px;color:var(--sub);border-top:1px solid var(--line);padding-top:16px}
+
+/* draft-only banner */
+.draft{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border:1.5px dashed var(--sub);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--sub)}
+.draft label{display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;color:var(--ink)}
+@media (prefers-reduced-motion:no-preference){.uc,.stat{transition:transform .15s}.uc:hover{transform:translateY(-2px)}}
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <a class="mark" href="https://www.instagram.com/bid.archive/" target="_blank" rel="noopener"><i>BID</i>bid.archive</a>
+    <nav class="links">
+      <a class="btn" href="https://www.threads.com/@bid.archive" target="_blank" rel="noopener">스레드</a>
+      <a class="btn fill" href="https://www.instagram.com/bid.archive/" target="_blank" rel="noopener">인스타 팔로우</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>경매 예상낙찰가,<br><em>결과로</em> 증명합니다</h1>
+    <p>서울·경기·부산 아파트 경매를 매주 골라 예상낙찰가를 먼저 공개하고, 매각기일이 지나면 실제 낙찰가와 비교합니다. 틀린 예측도 지우지 않고 전부 남깁니다. 강의·회원제는 없습니다. 살 집 한 채가 경매에 나왔을 때, 그 한 건만 확인해 드립니다.</p>
+    <div class="stats">
+      <div class="stat"><div class="k">누적 예측</div><div class="v" id="sTotal">0</div><div class="s" id="sTotalS">건</div></div>
+      <div class="stat"><div class="k">적중률 (±3%)</div><div class="v" id="sHit">–</div><div class="s" id="sHitS">결과 확인 0건</div></div>
+      <div class="stat"><div class="k">평균 오차</div><div class="v" id="sErr">–</div><div class="s">예상가 vs 낙찰가</div></div>
+      <div class="stat"><div class="k">결과 대기</div><div class="v" id="sWait">0</div><div class="s">건</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>이번 주 예측</h2><span class="note">매각기일 전 물건 · 카드는 인스타 게시물과 같습니다</span></div>
+    <div class="up" id="up"></div>
+  </section>
+
+  <section>
+    <div class="sec-h">
+      <h2>전체 기록</h2>
+      <div class="chips" role="group" aria-label="지역 필터" id="chips"></div>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr>
+          <th>매각기일</th><th>지역</th><th>단지</th><th>사건번호</th>
+          <th class="r">최저가</th><th class="r">예상가</th><th class="r">낙찰가</th><th class="r">오차</th><th class="r">응찰</th><th>결과</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>이렇게 채점합니다</h2></div>
+    <div class="rule">
+      <div><b>오차 = (낙찰가 − 예상가) ÷ 낙찰가</b><span>+면 예상보다 비싸게, −면 싸게 낙찰</span></div>
+      <div><b>±3% 안이면 적중</b><span>10억 물건이면 9.7억~10.3억 사이</span></div>
+      <div><b>변경·취하는 집계 제외</b><span>표에는 사유와 함께 그대로 남깁니다</span></div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>살 집이 경매에 나왔다면<br><em>사건번호</em>만 DM 주세요</h2>
+    <div class="links">
+      <a class="btn fill" href="https://www.instagram.com/bid.archive/" target="_blank" rel="noopener">@bid.archive 팔로우</a>
+      <a class="btn" href="https://www.instagram.com/bid.archive/" target="_blank" rel="noopener">입찰 키트 받기</a>
+    </div>
+    <p>강의·단톡방·회원제 없이 그 한 건의 예상 낙찰가와 떠안을 돈, 입찰 상한가를 정리해 드립니다. 입찰 키트는 인스타 게시물에 '체크리스트' 댓글을 남기면 DM으로 보내드립니다.</p>
+  </section>
+
+  <footer>개인 분석이며 투자 권유가 아닙니다. 입찰 전 매각물건명세서 원본을 꼭 확인하세요. 실거래가: 국토교통부 실거래가 공개시스템. 마지막 갱신 <span class="num" id="updated">2026.10.21</span></footer>
+</div>
+
+<script>
+/* 데이터: 결과가 나오면 result(원), bidders(명)만 채우면 됩니다. status: 'changed'(기일 변경)·'withdrawn'(취하) */
+const RECORDS = [
+  {region:"서울", court:"서울북부", case_no:"2024타경112971", title:"전농동삼성래미안", area:"26평 · 5/20층", date:"2026-11-03",
+   minimum:612800000, market:1150000000, predict:1050000000, result:null, bidders:null, locked:false,
+   cards:["112971-1.jpg","112971-2.jpg","112971-3.jpg"]},
+  {region:"서울", court:"서울북부", case_no:"2026타경10589", title:"중계그린", area:"15평 · 15/15층", date:"2026-11-03",
+   minimum:497600000, market:700000000, predict:590000000, result:null, bidders:null, locked:false,
+   cards:["10589-1.jpg","10589-2.jpg","10589-3.jpg"]},
+];
+const HIT = 0.03;
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+
+const eok = v => {
+  const e = v/1e8;
+  if (e >= 10) { const j = Math.floor(e), m = Math.round((v - j*1e8)/1e4); return m ? `${j}억 ${m.toLocaleString()}만` : `${j}억`; }
+  return `${(Math.round(e*100)/100).toString()}억`;
+};
+const errOf = r => (r.result - r.predict) / r.result;
+const fmtDate = s => s.slice(2).replace(/-/g,".");
+const dday = s => { const d = Math.round((new Date(s+"T00:00:00") - TODAY)/864e5); return d > 0 ? `D-${d}` : d === 0 ? "D-DAY" : "결과 대기"; };
+
+let region = "전체";
+try { region = localStorage.getItem("bidRegion") || "전체"; } catch(e) {}
+
+function data(){ return RECORDS; }
+
+function renderStats(all){
+  const done = all.filter(r => r.result && !r.status);
+  const hits = done.filter(r => Math.abs(errOf(r)) <= HIT);
+  document.getElementById("sTotal").textContent = all.length;
+  document.getElementById("sWait").textContent = all.filter(r => !r.result && !r.status).length;
+  document.getElementById("sHit").textContent = done.length ? Math.round(hits.length/done.length*100) + "%" : "–";
+  document.getElementById("sHitS").textContent = `결과 확인 ${done.length}건 중 ${hits.length}건`;
+  document.getElementById("sErr").textContent = done.length ? (done.reduce((s,r)=>s+Math.abs(errOf(r)),0)/done.length*100).toFixed(1) + "%" : "–";
+}
+
+function renderUpcoming(all){
+  const up = all.filter(r => !r.result && !r.status).sort((a,b)=>a.date.localeCompare(b.date));
+  const box = document.getElementById("up");
+  if (!up.length){ box.innerHTML = `<div class="empty">이번 주 예측을 준비 중입니다. 인스타에서 먼저 공개합니다.</div>`; return; }
+  box.innerHTML = up.map(r => `
+    <article class="uc">
+      <div class="row"><span class="dday">${dday(r.date)}</span><span class="case">${r.court} ${r.case_no}</span></div>
+      <div><h3>${r.title}</h3><div class="meta">${r.region} · ${r.area} · 매각기일 ${fmtDate(r.date)}</div></div>
+      <div class="ladder">
+        <div><div class="k">최저가</div><div class="v">${eok(r.minimum)}</div></div>
+        <div><div class="k">시세</div><div class="v">${eok(r.market)}</div></div>
+        <div class="pick"><div class="k">예상 낙찰가</div><div class="v ${r.locked?'lock':''}">${r.locked?'0.00억':eok(r.predict)}</div></div>
+      </div>
+      ${r.cards ? `<div class="thumbs">${r.cards.map((c,i)=>`<img src="${c}" alt="${r.title} 카드 ${i+1}" loading="lazy">`).join("")}</div>` : ""}
+    </article>`).join("");
+}
+
+function renderChips(all){
+  const regions = ["전체","서울","경기","부산"];
+  document.getElementById("chips").innerHTML = regions.map(g => {
+    const n = g === "전체" ? all.length : all.filter(r=>r.region===g).length;
+    return `<button class="chip" type="button" aria-pressed="${g===region}" data-r="${g}">${g} <span class="num">${n}</span></button>`;
+  }).join("");
+}
+
+function renderRows(all){
+  const rows = all.filter(r => region === "전체" || r.region === region).sort((a,b)=>b.date.localeCompare(a.date));
+  const tb = document.getElementById("rows");
+  if (!rows.length){ tb.innerHTML = `<tr><td colspan="10" class="empty">${region} 기록이 아직 없습니다.</td></tr>`; return; }
+  tb.innerHTML = rows.map(r => {
+    let res = `<span class="pill wait">결과 대기</span>`, err = "–";
+    if (r.status === "changed") res = `<span class="pill wait">기일 변경</span>`;
+    else if (r.status === "withdrawn") res = `<span class="pill wait">취하</span>`;
+    else if (r.result){
+      const e = errOf(r); const hit = Math.abs(e) <= HIT;
+      res = `<span class="pill ${hit?'hit':'miss'}">${hit?'적중':'빗나감'}</span>`;
+      err = `<span class="err ${e>0?'pos':'neg'}">${e>0?'+':''}${(e*100).toFixed(1)}%</span>`;
+    }
+    return `<tr>
+      <td class="num">${fmtDate(r.date)}</td><td>${r.region}</td><td><b>${r.title}</b> <span class="case">${r.area}</span></td>
+      <td class="case">${r.court} ${r.case_no}</td>
+      <td class="r num">${eok(r.minimum)}</td><td class="r big pk">${r.locked&&!r.result?'🔒':eok(r.predict)}</td>
+      <td class="r big">${r.result?eok(r.result):'–'}</td><td class="r num">${err}</td>
+      <td class="r num">${r.bidders?r.bidders+'명':'–'}</td><td>${res}</td></tr>`;
+  }).join("");
+}
+
+function render(){ const all = data(); renderStats(all); renderUpcoming(all); renderChips(all); renderRows(all); }
+
+document.getElementById("chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  region = b.dataset.r; try { localStorage.setItem("bidRegion", region); } catch(err) {}
+  render();
+});
+render();
+</script>
+</html>
