@@ -251,7 +251,7 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
     </div>
     <div class="stats" id="stats"></div>
     <div class="days" id="days" role="group" aria-label="매각기일"></div>
-    <button class="herobtn" id="heroMap">🗺 지도에서 물건 위치 보기</button>
+    <button class="herobtn" id="heroMap">🗺 지도에서 경매 위치 보기</button>
   </div>
 </header>
 
@@ -415,7 +415,7 @@ function card(x){
    <div class="pair">
      <div><div class="lbl">이번 최저가</div><div class="big">${won(x.min)}</div></div>
      <div class="vs">${ref(x)?`<div class="lbl">${ref(x).label}</div><div class="mid">${won(ref(x).v)}</div><div class="when">${ref(x).sub}</div>`:`<div class="lbl">비교할 거래</div><div class="mid none">없음</div>`}</div>
-   </div>   <div class="tags">${x.rec?'<span class="tag rec">⭐ 추천</span>':""}${x.cand?'<span class="tag cand">후보</span>':""}${x.rights?'<span class="tag ok">✓ 권리 확인</span>':""}${x.flag?`<span class="tag warn">${esc(x.flag)}</span>`:""}${!x.rights&&!x.rcheck?'<span class="tag">인수조건 확인 전</span>':""}${x.mktN?`<span class="tag">2년 거래 ${x.mktN}건</span>`:""}</div>
+   </div>   <div class="tags">${x.rec?'<span class="tag rec">⭐ 추천</span>':""}${x.cand?'<span class="tag cand">후보</span>':""}${x.rights?'<span class="tag ok">✓ 권리 확인</span>':""}${x.flag?`<span class="tag warn">${esc(x.flag)}</span>`:""}${!x.rights&&!x.rcheck?'<span class="tag">권리 검토 중</span>':""}${x.mktN?`<span class="tag">2년 거래 ${x.mktN}건</span>`:""}</div>
    <div class="c-foot">
      <div class="pred"><small>예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">DM으로 문의</b>`}</div>
      <div class="acts"><button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></div>
