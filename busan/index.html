@@ -78,7 +78,8 @@ h1 .num{color:var(--lime)}
 .pick .sub{font-size:13px;color:var(--muted)}
 .pick .pv{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;background:var(--raised);border-radius:14px;padding:14px 16px}
 .pick .pv small{display:block;font-size:12px;color:var(--muted)}
-.pick .pv b{font-family:var(--f-num);font-size:28px;font-weight:900;letter-spacing:-.03em}
+.pick .pv>div{min-width:0}
+.pick .pv b{white-space:nowrap;font-family:var(--f-num);font-size:28px;font-weight:900;letter-spacing:-.03em}
 .pick .pv .hl{background:var(--lime);color:var(--on-lime);padding:0 8px;border-radius:8px}
 .pick .pv .ask{font-size:16px;font-weight:800}
 
@@ -134,7 +135,7 @@ select{font:inherit;font-size:13px;height:40px;padding:0 30px 0 12px;border-radi
 .tag.warn{color:var(--warn);background:var(--warn-bg);border-color:transparent}
 .c-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:12px}
 .pred small{display:block;font-size:11px;color:var(--muted)}
-.pred b{font-family:var(--f-num);font-size:18px;font-weight:900}
+.pred b{white-space:nowrap;font-family:var(--f-num);font-size:18px;font-weight:900}
 .pred b.hl{background:var(--lime);color:var(--on-lime);padding:0 6px;border-radius:6px}
 .pred .ask{font-family:var(--f-body);font-size:14px}
 .acts{display:flex;gap:6px}
@@ -229,7 +230,7 @@ td.cheap,td.dear{font-size:12px;font-weight:700}
 .tile small{font-size:12px;color:var(--muted)}
 .tile b{font-family:var(--f-num);font-size:18px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tile span{font-size:11.5px;color:var(--faint)}
-.tile.hl{background:var(--ink);color:var(--bg)} .tile.hl small,.tile.hl span{color:var(--lime)}
+.tile.hl{background:var(--lime);color:var(--on-lime)} .tile.hl small,.tile.hl span{color:var(--on-lime);opacity:.7}
 .flagbox{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700}
 .tblwrap{border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .tblh{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px 6px;font-size:12px;color:var(--muted)}
