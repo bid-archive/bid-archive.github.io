@@ -368,6 +368,11 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
   .save b{font-size:15px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.hot{border:2px solid #b5e41f!important;box-shadow:0 8px 26px rgba(181,228,31,.18)!important}
+.hot::before{height:6px!important;background:#b5e41f!important}
+.crit{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.crit span{font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid #b5e41f;color:var(--text)}
 </style>
 <style>:root{color-scheme:light}html,body{margin:0}img{max-width:100%}</style>
 </head>
@@ -378,12 +383,12 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
   <div class="in">
     <div class="nav">
       <a class="brand" href="/"><span class="mark">bid</span>bid.archive</a>
-      <div class="navr"><a href="/">📊 성적표</a><div class="updated">마지막 업데이트 <b class="num">10.30 18:30</b><span class="src"><br>경매 대법원 · 실거래 국토부</span></div></div>
+      <div class="navr"><a href="/">📊 적중 기록</a><div class="updated">마지막 업데이트 <b class="num">10.30 18:30</b><span class="src"><br>경매 대법원 · 실거래 국토부</span></div></div>
     </div>
     <div class="headline">
       <div class="regions" role="tablist" aria-label="지역"><a class="rg on" href="/busan/" aria-current="page">부산</a><span class="rg off" title="준비 중">서울 <i>준비 중</i></span><span class="rg off" title="준비 중">경기·인천 <i>준비 중</i></span></div>
       <h1>이 아파트, <span class="lime-t">얼마에</span><br>낙찰될까?</h1>
-      <p class="lede">예상낙찰가를 매각 전에 먼저 공개하고, 결과는 <a href="/" class="lk">성적표</a>로 채점합니다.</p>
+      <p class="lede">예상낙찰가를 매각 전에 먼저 공개하고, 결과는 <a href="/" class="lk">적중 기록</a>으로 공개합니다.</p>
       <div class="howto"><span class="hl-k">활용법</span><ol class="steps"><li><b>①</b> 진행 중인 경매 전체에서 관심 물건 찾기</li><li><b>②</b> 사건번호 복사 → 인스타 DM → 예상낙찰가 회신</li></ol></div>
       <div class="cta-row"><a class="btn lime" href="#list-top">부산 경매 <span id="ctaN">44</span>건 둘러보기 ↓</a></div>
     </div>
@@ -391,12 +396,12 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
 </header>
 
 <section class="sec"><div class="in">
-  <div class="sec-h"><div><h2>✅ bid PICK</h2><p>bid.archive가 등기·임차인·점유까지 직접 확인하고 예상낙찰가를 낸 물건 · 예상가 적중률은 성적표에서 공개</p></div><div class="sec-cta"><a class="btn dark" href="https://ig.me/m/bid.archive" target="_blank" rel="noopener">예상가 DM 문의</a></div></div>
+  <div class="sec-h"><div><h2>✅ bid PICK</h2><p>bid.archive가 직접 확인하고 낸 예상낙찰가</p></div><div class="sec-cta"><a class="btn dark" href="https://ig.me/m/bid.archive" target="_blank" rel="noopener">예상가 DM 문의</a></div></div>
   <div class="picks" id="picks"></div>
 </div></section>
 
 <section class="sec"><div class="in">
-  <div class="sec-h"><div><h2>🔥 추천 경매 · 시세보다 20% 이상 싸게</h2><p>300세대 이상 단지, 최근 1년 같은 평형 실거래보다 20% 넘게 싸고 거래가 활발한(같은 평형 1년 거래 세대수의 2%, 최대 10건 이상) 물건 · 권리는 검토 중</p></div></div>
+  <div class="sec-h"><div><h2>🔥 추천 경매</h2><p>조건에 맞는 물건을 자동으로 골랐어요 · 권리는 검토 중</p><div class="crit"><span>300세대+</span><span>같은 평형 시세보다 20%↓</span><span>1년 거래 활발</span><span>1회 이상 유찰</span></div></div></div>
   <div class="hots" id="hots"></div>
 </div></section>
 
