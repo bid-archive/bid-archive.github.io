@@ -309,24 +309,29 @@ html{scroll-behavior:smooth}
 .hot .acts{flex-wrap:nowrap!important}
 .hot .acts .btn{height:34px;padding:0 11px}
 .hot .askbtn{padding:0 12px!important;height:34px;line-height:34px;font-size:13px}
-/* bid PICK = 주인공(라임 카드), 추천 = 보조(일반 카드) */
-.pick{background:#c6f432!important;color:#121212;box-shadow:0 10px 30px rgba(198,244,50,.18)}
+/* bid PICK = 주인공(주황 카드), 추천 = 보조(흰 카드 + 라임) */
+.pick{background:#ff8a3d!important;color:#121212;box-shadow:0 10px 30px rgba(255,138,61,.22)}
 .pick::before{display:none}
-.pick .row1,.pick .row1 span,.pick .sub,.pick .pv small{color:rgba(18,18,18,.62)!important}
-.pick .row1 span.dd{background:#121212!important;color:#c6f432!important;border-color:#121212!important}
-.pick .pv{background:rgba(18,18,18,.07)!important}
-.pick .pv .hl{background:#121212!important;color:#c6f432!important}
+.pick .row1,.pick .row1 span,.pick .sub,.pick .pv small{color:rgba(18,18,18,.66)!important}
+.pick .row1 span.dd{background:#121212!important;color:#ff8a3d!important;border-color:#121212!important}
+.pick .pv{background:rgba(18,18,18,.08)!important}
+.pick .pv .hl{background:#121212!important;color:#ff8a3d!important}
 .pick .btn.k{background:#ffffff;border-color:#ffffff;color:#121212}
 .pick .btn.dark{background:#121212;border-color:#121212;color:#f4f4f0}
-.pick .askbtn{background:#121212!important;color:#c6f432!important}
-.hot{background:var(--surface)!important;color:var(--text)!important;border:1px solid var(--line)}
+.pick .askbtn{background:#121212!important;color:#ff8a3d!important}
+.hot{background:var(--surface)!important;color:var(--text)!important;box-shadow:var(--shadow);overflow:hidden}
+.hot::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--lime)}
 .hot .row1,.hot .case,.hot .sub,.hsave small,.hmeta,.hpred{color:var(--muted)!important}
 .hmeta b{color:var(--text)!important}
-.hrank{font-size:28px!important;color:var(--faint)!important}
-.hsave b{font-size:26px!important;color:var(--text)!important}
-.hsave span{color:#e8590c!important;font-size:14px!important}
+.hrank{font-size:30px!important;color:var(--faint)!important}
+.hsave b{font-size:28px!important;color:var(--text)!important}
+.hsave span{color:var(--good)!important;font-size:14px!important}
 .hot .btn.dark{background:var(--ink)!important;color:var(--bg)!important;border-color:var(--ink)!important}
-.tag.cand{background:transparent!important;border-color:#e8590c!important;color:#e8590c!important}
+.tag.cand{background:var(--lime)!important;border-color:var(--lime)!important;color:var(--on-lime)!important}
+.tag.rec{background:#ff8a3d!important;border-color:#ff8a3d!important;color:#121212!important}
+.card.rec{border-color:#ff8a3d!important;box-shadow:0 0 0 1px #ff8a3d!important}
+.seg.star button[aria-pressed="true"]{background:#ff8a3d!important;color:#121212!important}
+.lede b.lime{color:#ff8a3d}
 .lede{font-size:15px}
 .empty{grid-column:1/-1;padding:56px 0;text-align:center;color:var(--muted)}
 
@@ -364,13 +369,13 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
       <h1>이 경매, <span class="lime-t">얼마에</span><br>낙찰될까?</h1>
       <p class="lede">예상낙찰가를 매각 전에 먼저 공개하고, 결과로 증명합니다.</p>
       <ol class="steps"><li><b>①</b> 진행 중인 경매 전체에서 관심 물건 찾기</li><li><b>②</b> 사건번호 복사 → 인스타 DM</li><li><b>③</b> 예상낙찰가 회신 · 결과는 성적표로 채점</li></ol>
-      <div class="cta-row"><a class="btn lime" href="#list-top">부산 경매 <span id="ctaN">44</span>건 둘러보기 ↓</a><a class="btn ghost" href="https://ig.me/m/bid.archive" target="_blank" rel="noopener">사건번호로 예상가 받기</a><a class="btn ghost" href="/">📊 성적표</a></div>
+      <div class="cta-row"><a class="btn lime" href="#list-top">부산 경매 <span id="ctaN">44</span>건 둘러보기 ↓</a><a class="btn ghost" href="https://ig.me/m/bid.archive" target="_blank" rel="noopener">사건번호로 예상가 받기</a></div>
     </div>
   </div>
 </header>
 
 <section class="sec"><div class="in">
-  <div class="sec-h"><div><h2>✅ bid PICK</h2><p>bid.archive가 등기·임차인·점유까지 직접 확인하고 예상낙찰가를 낸 물건 · 예상가 적중률은 성적표에서 공개</p></div><div class="sec-cta"><a class="btn" href="https://bid-archive.github.io/" target="_blank" rel="noopener">📊 예상가 성적표</a><a class="btn dark" href="https://ig.me/m/bid.archive" target="_blank" rel="noopener">예상가 DM 문의</a></div></div>
+  <div class="sec-h"><div><h2>✅ bid PICK</h2><p>bid.archive가 등기·임차인·점유까지 직접 확인하고 예상낙찰가를 낸 물건 · 예상가 적중률은 성적표에서 공개</p></div><div class="sec-cta"><a class="btn dark" href="https://ig.me/m/bid.archive" target="_blank" rel="noopener">예상가 DM 문의</a></div></div>
   <div class="picks" id="picks"></div>
 </div></section>
 
