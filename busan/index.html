@@ -332,6 +332,19 @@ html{scroll-behavior:smooth}
 .hot .btn.k{background:var(--surface)!important}
 .herobtn{border-color:var(--hero-line)!important;color:var(--on-hero)!important}
 .herobtn:hover{background:var(--hero-line)!important;color:var(--on-hero)!important}
+.pick{gap:8px!important}
+.pick h3{font-size:20px!important;margin-top:2px}
+.pbig{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:8px;margin-top:4px}
+.pbig small{grid-column:1/-1;font-size:12.5px;font-weight:700;color:#e8590c}
+.pbig b{font-size:40px;font-weight:900;letter-spacing:-.04em;line-height:1.1;color:#ff6a13;white-space:nowrap}
+.pbig b.q{font-size:30px;color:var(--faint)}
+.pbig span{grid-column:1/-1;font-size:13.5px;font-weight:800;color:var(--good);white-space:nowrap}
+.pbig b.q+span{color:var(--muted);font-weight:600}
+.pmeta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--muted)}
+.pmeta b{color:var(--text)}
+.pick .acts{display:flex;gap:6px;flex-wrap:nowrap;margin-top:6px}
+.pick .acts .btn{height:34px;padding:0 12px}
+.pick .askbtn{margin-top:0!important;padding:0 14px!important;height:34px;line-height:34px}
 .empty{grid-column:1/-1;padding:56px 0;text-align:center;color:var(--muted)}
 
 footer{border-top:1px solid var(--line);margin-top:20px}
@@ -456,12 +469,14 @@ function drawDays(){$("days").innerHTML=[`<button class="day" data-d="" aria-pre
 drawDays();
 
 /* picks */
-$("picks").innerHTML=DATA.filter(x=>x.rec).sort((a,b)=>a.date.localeCompare(b.date)).map(x=>`<article class="pick">
-  <div class="row1"><span>${x.court} ${x.case}</span><span class="dd ${days(x.date)<=5?"soon":""}">${dlabel(x.date)} · ${md(x.date)}</span></div>
-  <div><h3>${esc(x.name)}</h3><div class="sub">${x.gu}${x.dong?" "+x.dong:""}${x.m2?" · "+Math.round(x.m2/3.3058)+"평":""} · 최저가 ${eok(x.min)} · 시세 ${eok(x.mkt)}</div></div>
-  <div class="pv"><small>예상낙찰가</small><div class="pvrow">${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<button class="askbtn" data-case="${x.case}">예상가 받기</button>`}
-  <span class="acts"><button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></span></div></div>
-</article>`).join("");
+$("picks").innerHTML=DATA.filter(x=>x.rec).sort((a,b)=>a.date.localeCompare(b.date)).map(x=>{const ref=x.last?x.last[2]:x.mkt;const gp=x.pred&&ref?ref-x.pred:null;return `<article class="pick">
+  <div class="row1"><span>${x.court} ${x.case}</span><span class="dd">${dlabel(x.date)} · ${md(x.date)}</span></div>
+  <h3>${esc(x.name)}</h3>
+  <div class="sub">${x.gu}${x.dong?" "+x.dong:""}${x.m2?" · "+Math.round(x.m2/3.3058)+"평":""}${x.hh?" · "+x.hh.toLocaleString()+"세대":""}</div>
+  <div class="pbig"><small>bid.archive 예상낙찰가</small>${x.pred?`<b class="num">${eok(x.pred)}</b>${gp>0?`<span>최근 거래가보다 ${eok(gp)} 낮게 예상</span>`:""}`:`<b class="num q">비공개</b><span>사건번호 DM 시 공개</span>`}</div>
+  <div class="pmeta"><span>최저가 <b>${eok(x.min)}</b></span><span>${x.last?"최근 거래 "+eok(x.last[2])+" ("+x.last[0].slice(0,5)+")":"시세 "+eok(x.mkt)}</span></div>
+  <div class="acts">${x.pred?"":`<button class="askbtn" data-case="${x.case}">예상가 받기</button>`}<button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></div>
+</article>`}).join("");
 $("picks").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
 
 /* filters */
