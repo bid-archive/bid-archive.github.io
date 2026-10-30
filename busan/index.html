@@ -6,6 +6,7 @@
 <meta name="description" content="부산 아파트 경매 진행 물건 전체와 시세 비교, bid.archive 추천 물건">
 <meta property="og:title" content="bid.archive · 부산 아파트 경매">
 <meta property="og:description" content="최근 실거래가보다 얼마나 싼지 한눈에. 예상낙찰가는 인스타 DM @bid.archive">
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e6e72570d5cf875f65a1e5e3c51b3eaa&libraries=services&autoload=false"></script>
 <title>bid.archive 경매물건</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -431,12 +432,11 @@ const MAP={loading:null,pos:null,map:null};
 function loadKakao(){
   if(MAP.loading)return MAP.loading;
   MAP.loading=new Promise((ok,no)=>{
-    if(window.kakao&&kakao.maps){kakao.maps.load(ok);return}
-    const sc=document.createElement("script");
-    sc.src="https://dapi.kakao.com/v2/maps/sdk.js?appkey="+KAKAO_KEY+"&autoload=false&libraries=services";
-    sc.onload=()=>kakao.maps.load(ok);sc.onerror=no;document.head.appendChild(sc);
-    setTimeout(()=>no(new Error("timeout")),6000)});
-  MAP.loading.catch(()=>{MAP.loading=null});
+    const t0=Date.now();
+    (function wait(){
+      if(window.kakao&&window.kakao.maps&&window.kakao.maps.load){window.kakao.maps.load(()=>ok());return}
+      if(Date.now()-t0>5000){MAP.loading=null;no(new Error("kakao unavailable"));return}
+      setTimeout(wait,150)})()});
   return MAP.loading}
 function mapFail(x){$("mapView").innerHTML=`<div class="mapmsg">이 화면에서는 지도를 불러올 수 없어요.<br><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">카카오맵에서 보기</a></div>`}
 function locate(x){return new Promise(res=>{
