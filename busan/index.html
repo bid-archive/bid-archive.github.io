@@ -6,7 +6,7 @@
 <meta name="description" content="부산 아파트 경매 진행 물건 전체와 시세 비교, bid.archive 추천 물건">
 <meta property="og:title" content="bid.archive · 부산 아파트 경매">
 <meta property="og:description" content="최근 실거래가보다 얼마나 싼지 한눈에. 예상낙찰가는 인스타 DM @bid.archive">
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e6e72570d5cf875f65a1e5e3c51b3eaa&libraries=services&autoload=false"></script>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e6e72570d5cf875f65a1e5e3c51b3eaa&libraries=services,clusterer&autoload=false"></script>
 <title>bid.archive 경매물건</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -483,7 +483,7 @@ $("view").querySelectorAll("button").forEach(b=>b.onclick=()=>setView(b.dataset.
 $("heroMap").onclick=()=>{setView("map");document.querySelector(".fbar").scrollIntoView({behavior:"smooth"})};
 let COORD={};try{COORD=JSON.parse(localStorage.getItem("bidCoord")||"{}")}catch(e){}
 function saveCoord(){try{localStorage.setItem("bidCoord",JSON.stringify(COORD))}catch(e){}}
-const BIG={map:null,ovs:[],token:0};
+const BIG={map:null,ovs:[],token:0,cl:null};
 async function coordOf(x){
   if(COORD[x.case])return COORD[x.case];
   const p=await locate(x);if(!p)return null;
@@ -494,7 +494,8 @@ async function drawPins(r){
   const K=window.kakao;
   if(!BIG.map){el.innerHTML="";BIG.map=new K.maps.Map(el,{center:new K.maps.LatLng(35.18,129.07),level:8});BIG.map.addControl(new K.maps.ZoomControl(),K.maps.ControlPosition.RIGHT)}
   else BIG.map.relayout();
-  BIG.ovs.forEach(o=>o.setMap(null));BIG.ovs=[];
+  if(BIG.cl)BIG.cl.clear();BIG.ovs.forEach(o=>o.setMap(null));BIG.ovs=[];
+  if(!BIG.cl&&K.maps.MarkerClusterer)BIG.cl=new K.maps.MarkerClusterer({map:BIG.map,averageCenter:true,minLevel:6,gridSize:70,styles:[{width:'44px',height:'44px',background:'#121212',color:'#c6f432',borderRadius:'50%',textAlign:'center',lineHeight:'44px',fontWeight:'800',fontSize:'15px',border:'2px solid #c6f432'}]});
   const bounds=new K.maps.LatLngBounds();let n=0;
   for(const x of r){
     const c=await coordOf(x);if(tok!==BIG.token)return;if(!c)continue;
@@ -502,7 +503,8 @@ async function drawPins(r){
     const d=document.createElement("button");d.className="mpin"+(x.rec?" rec":x.cand?" cand":"");
     d.innerHTML=`<b>${eok(x.min)}</b><span>${esc(x.name.replace(/아파트$/,""))}</span>`;
     d.onclick=()=>openSheet(x);
-    const ov=new K.maps.CustomOverlay({position:pos,content:d,yAnchor:1.15,clickable:true,zIndex:x.rec?3:x.cand?2:1});ov.setMap(BIG.map);BIG.ovs.push(ov)}
+    const ov=new K.maps.CustomOverlay({position:pos,content:d,yAnchor:1.15,clickable:true,zIndex:x.rec?3:x.cand?2:1});BIG.ovs.push(ov)}
+  if(BIG.cl)BIG.cl.addMarkers(BIG.ovs);else BIG.ovs.forEach(o=>o.setMap(BIG.map));
   if(n)BIG.map.setBounds(bounds,40,40,40,40)}
 function render(){
   const [,p0,p1]=PRICES[st.price],[,s0,s1]=SIZES[st.size],f0=FAILS[st.fail][1],q=st.q.toLowerCase();
