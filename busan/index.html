@@ -303,7 +303,7 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
     <div class="headline">
       <span class="eyebrow">BUSAN · APARTMENT AUCTION</span>
       <h1>부산 아파트 경매 <span class="num" id="hTotal">0</span>건<br>최근 거래가보다 최대 <span class="num big" id="hMax">0</span> 싸게</h1>
-      <p class="lede">법원 경매에 나온 부산 아파트를 모두 모아, 같은 단지 실거래가와 바로 비교해 드립니다. 시세보다 크게 싼 물건은 <b class="fire">🔥 급매급</b>, 권리까지 직접 확인한 물건은 <b class="lime">⭐ 추천</b>으로 표시합니다.</p>
+      <p class="lede">법원 경매에 나온 부산 아파트를 모두 모아, 같은 단지 실거래가와 바로 비교해 드립니다. 시세보다 크게 싼 물건은 <b class="fire">🔥 추천</b>, 그중 권리·점유까지 직접 확인하고 예상낙찰가를 낸 물건은 <b class="lime">bid PICK</b>으로 표시합니다.</p>
     </div>
     <div class="stats" id="stats"></div>
     <div class="days" id="days" role="group" aria-label="매각기일"></div>
@@ -312,12 +312,12 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
 </header>
 
 <section class="sec"><div class="in">
-  <div class="sec-h"><div><h2>🔥 급매급 경매 · 시세보다 20% 이상 싸게</h2><p>최근 1년 같은 단지·같은 평형 실거래보다 20% 넘게 싸고, 거래도 활발한 물건 · 권리는 아직 검토 중</p></div></div>
+  <div class="sec-h"><div><h2>🔥 추천 경매 · 시세보다 20% 이상 싸게</h2><p>300세대 이상 단지, 최근 1년 같은 평형 실거래보다 20% 넘게 싸고 거래도 활발한 물건 · 권리는 검토 중</p></div></div>
   <div class="hots" id="hots"></div>
 </div></section>
 
 <section class="sec"><div class="in">
-  <div class="sec-h"><div><h2>bid.archive 추천</h2><p>권리·점유까지 직접 확인하고 예상낙찰가를 낸 물건</p></div></div>
+  <div class="sec-h"><div><h2>bid PICK</h2><p>bid.archive가 권리·점유까지 직접 확인하고 예상낙찰가를 낸 물건</p></div></div>
   <div class="picks" id="picks"></div>
 </div></section>
 
@@ -344,8 +344,8 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
 <footer><div class="in">
   <div class="rules">
     <div class="rule"><b>가격 비교</b>같은 단지·같은 평형 실거래(국토부, 직거래·해제 제외)의 최근 거래, 비슷한 층(±3층) 최근 거래, 1년 평균·최저, 감정가를 모두 최저가와 비교합니다. 할인율은 1년 평균 기준입니다.</div>
-    <div class="rule"><b>🔥 급매급</b>같은 단지·같은 평형 1년 평균 실거래보다 20% 이상 싸고, 1회 이상 유찰, 1년 거래 3건 이상, 특이사항 없음, 1층 제외. 권리는 아직 확인 전입니다.</div>
-    <div class="rule"><b>⭐ 추천</b>급매급 중 bid.archive가 등기·임차인·점유까지 확인한 물건입니다. 예상낙찰가는 사건번호를 인스타 DM(@bid.archive)으로 보내면 알려드립니다.</div>
+    <div class="rule"><b>🔥 추천</b>300세대 이상 단지, 같은 단지·같은 평형 1년 평균 실거래보다 20% 이상 싸고, 1회 이상 유찰, 1년 거래 3건 이상, 전용 40~135㎡, 특이사항 없음, 1층 제외. 권리는 아직 확인 전입니다.</div>
+    <div class="rule"><b>bid PICK</b>bid.archive가 등기·임차인·점유까지 직접 확인하고 예상낙찰가를 낸 물건입니다. 예상낙찰가는 사건번호를 인스타 DM(@bid.archive)으로 보내면 알려드립니다.</div>
   </div>
   <div>입찰 전 매각물건명세서와 현장을 반드시 직접 확인하세요. 이 페이지는 공개자료를 정리한 참고 정보이며 투자 권유가 아닙니다.</div>
   <div class="draft">시안 · 부산지법 본원 40건(11/3~11/11 기일) + 동부·서부지원 분석 완료 4건. 나머지 물건은 수집 중입니다.</div>
@@ -360,7 +360,7 @@ const DATA=[{"court": "부산", "case": "2024타경213", "name": "연산자이",
 const PRICES=[["금액 전체",0,Infinity],["1억↓",0,1e8],["1~2억",1e8,2e8],["2~4억",2e8,4e8],["4억↑",4e8,Infinity]];
 const SIZES=[["평형 전체",0,999],["~12평",0,40],["12~20평",40,65],["25평대",65,100],["30평↑",100,999]];
 const FAILS=[["유찰 전체",-1],["신건",0],["1회+",1],["2회+",2]];
-const PICKS=[["전체"],["🔥 급매급"],["⭐ 추천"]];
+const PICKS=[["전체"],["🔥 추천"],["bid PICK"]];
 const WK="일월화수목금토";
 const st={q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date",view:"list"};
 const $=id=>document.getElementById(id);
@@ -377,7 +377,7 @@ const kmap=x=>"https://map.kakao.com/link/search/"+encodeURIComponent(x.addr);
 $("hTotal").textContent=DATA.length;
 const ds=DATA.map(disc).filter(v=>v!=null&&v>0);
 const soon=DATA.filter(x=>days(x.date)<=7).length;
-$("stats").innerHTML=[["진행 물건",DATA.length,"건"],["7일 안에 마감",soon,"건"],["시세 대비 평균",Math.round(ds.reduce((a,b)=>a+b,0)/ds.length),"% 싸게"],["급매급 · 추천",DATA.filter(x=>x.cand).length+" · "+DATA.filter(x=>x.rec).length,"건"]]
+$("stats").innerHTML=[["진행 물건",DATA.length,"건"],["7일 안에 마감",soon,"건"],["시세 대비 평균",Math.round(ds.reduce((a,b)=>a+b,0)/ds.length),"% 싸게"],["추천 · bid PICK",DATA.filter(x=>x.cand).length+" · "+DATA.filter(x=>x.rec).length,"건"]]
   .map(([k,v,u])=>`<div class="stat"><small>${k}</small><b>${v}<em>${u}</em></b></div>`).join("");
 const dayList=[...new Set(DATA.map(x=>x.date))].sort();
 function drawDays(){$("days").innerHTML=[`<button class="day" data-d="" aria-pressed="${!st.day}"><small>매각기일</small><span>전체</span></button>`]
@@ -406,7 +406,7 @@ $("hots").innerHTML=hotList.filter(x=>x.cand).map((x,i)=>`<article class="hot">
    <div class="hsave"><small>${x.last?"최근 거래가":"시세"}보다</small><b class="num">${eok(gap(x))}</b><span>싸게</span></div>
    <div class="hmeta"><span>최저가 <b>${eok(x.min)}</b></span><span>${x.last?"최근 거래 "+eok(x.last[2])+" ("+x.last[0].slice(0,5)+")":"시세 "+eok(x.mkt)}</span></div>
    <div class="acts"><button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></div></div>
-</article>`).join("")||'<div class="empty">이번 주는 급매급 물건이 없어요.</div>';
+</article>`).join("")||'<div class="empty">이번 주는 추천 물건이 없어요.</div>';
 $("hots").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
 
 const guSel=$("gu");
@@ -504,7 +504,7 @@ function card(x){
    <div class="pair">
      <div><div class="lbl">이번 최저가</div><div class="big">${won(x.min)}</div></div>
      <div class="vs">${ref(x)?`<div class="lbl">${ref(x).label}</div><div class="mid">${won(ref(x).v)}</div><div class="when">${ref(x).sub}</div>`:`<div class="lbl">비교할 거래</div><div class="mid none">없음</div>`}</div>
-   </div>   <div class="tags">${x.rec?'<span class="tag rec">⭐ 추천</span>':""}${x.cand?'<span class="tag cand">🔥 급매급</span>':""}${x.rights?'<span class="tag ok">✓ 권리 확인</span>':""}${x.flag?`<span class="tag warn">${esc(x.flag)}</span>`:""}${!x.rights&&!x.rcheck?'<span class="tag">권리 검토 중</span>':""}${x.mktN?`<span class="tag">2년 거래 ${x.mktN}건</span>`:""}</div>
+   </div>   <div class="tags">${x.rec?'<span class="tag rec">bid PICK</span>':""}${x.cand?'<span class="tag cand">🔥 추천</span>':""}${x.rights?'<span class="tag ok">✓ 권리 확인</span>':""}${x.flag?`<span class="tag warn">${esc(x.flag)}</span>`:""}${!x.rights&&!x.rcheck?'<span class="tag">권리 검토 중</span>':""}${x.mktN?`<span class="tag">2년 거래 ${x.mktN}건</span>`:""}</div>
    <div class="c-foot">
      <div class="pred"><small>예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">DM으로 문의</b>`}</div>
      <div class="acts"><button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></div>
