@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light only">
-<meta name="description" content="이 아파트, 얼마에 낙찰될까? bid.archive가 아파트 경매 예상낙찰가를 먼저 공개하고 결과로 증명합니다. 부산 진행 경매 전체와 실거래 비교">
+<meta name="description" content="이 아파트, 얼마에 낙찰될까? 부산 아파트 경매 예상낙찰가를 매각 전에 공개합니다.">
 <meta property="og:title" content="bid.archive · 이 아파트, 얼마에 낙찰될까?">
 <meta property="og:description" content="예상낙찰가를 먼저 공개하고 결과로 증명합니다. 사건번호 DM @bid.archive">
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e6e72570d5cf875f65a1e5e3c51b3eaa&libraries=services,clusterer&autoload=false"></script>
@@ -403,7 +403,7 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
 
 
 <section class="listhead" id="list-top"><div class="in">
-  <div class="sec-h"><div><h2>부산 진행 경매 전체 <span class="num" id="hTotal">0</span>건</h2><p>관심 가는 물건이 있으면 <b>사건번호를 DM</b>으로 보내주세요. bid.archive가 예상낙찰가를 알려드립니다. 각 물건의 실거래·전월세·지도는 미리 비교해 두었습니다 · 🔥 추천 중 최대 <b class="num" id="hMax">0</b> 싸게</p></div></div>
+  <div class="sec-h"><div><h2>부산 진행 경매 전체 <span class="num" id="hTotal">0</span>건</h2></div></div>
   <div class="days" id="days" role="group" aria-label="매각기일"></div>
   <button class="herobtn" id="heroMap">🗺 지도에서 경매 위치 보기</button>
 </div></section>
@@ -487,7 +487,7 @@ $("picks").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.fin
 /* hot */
 const gap=x=>x.last?x.last[2]-x.min:(x.mkt?x.mkt-x.min:0);
 const hotList=DATA.filter(x=>x.cand||x.rec).filter(x=>gap(x)>0).sort((a,b)=>gap(b)-gap(a));
-$("hMax").textContent=eok(Math.max(...DATA.filter(x=>x.cand||x.rec).map(gap)));
+if($("hMax"))$("hMax").textContent=eok(Math.max(...DATA.filter(x=>x.cand||x.rec).map(gap)));
 $("hots").innerHTML=hotList.filter(x=>x.cand).map((x,i)=>`<article class="hot">
   <div class="hrank num">${i+1}</div>
   <div class="hbody"><div class="row1"><span class="case">${x.court} ${x.case}</span><span class="dd ${days(x.date)<=5?"soon":""}">${dlabel(x.date)} · ${md(x.date)}</span></div>
