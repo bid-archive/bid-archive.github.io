@@ -461,10 +461,12 @@ $("q").oninput=e=>{st.q=e.target.value.trim();render()};
 $("moreBtn").onclick=()=>{const a=$("adv");a.hidden=!a.hidden;$("moreBtn").setAttribute("aria-expanded",!a.hidden)};
 $("reset").onclick=()=>{Object.assign(st,{q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date"});$("q").value="";guSel.value="";$("sort").value="date";segs();drawDays();render()};
 
-async function askDM(c){try{await navigator.clipboard.writeText(c);toast("사건번호 "+c+" 복사됨 · DM 창에 붙여넣기 해주세요")}catch(e){toast(c+" · 이 번호를 DM으로 보내주세요")}setTimeout(()=>{window.open("https://ig.me/m/bid.archive","_blank","noopener")},400)}
+const COURTN={"부산":"부산지방법원","부산동부":"부산지방법원 동부지원","부산서부":"부산지방법원 서부지원"};
+function caseText(c){const x=DATA.find(d=>d.case===c);return x?(COURTN[x.court]||x.court)+" "+x.case+(x.name?" ("+x.name+")":""):c}
+async function askDM(c){const t=caseText(c);try{await navigator.clipboard.writeText(t);toast("복사됨: "+t+" · DM 창에 붙여넣어 주세요")}catch(e){toast(t+" · 이 내용을 DM으로 보내주세요")}setTimeout(()=>{window.open("https://ig.me/m/bid.archive","_blank","noopener")},400)}
 document.addEventListener("click",e=>{const b=e.target.closest(".askbtn");if(b){e.preventDefault();askDM(b.dataset.case)}});
 function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,1900)}
-async function copyCase(c){try{await navigator.clipboard.writeText(c);toast("사건번호를 복사했어요 · 인스타 DM에 붙여넣기")}catch(e){toast(c+" · 이 번호를 DM으로 보내주세요")}}
+async function copyCase(c){c=caseText(c);try{await navigator.clipboard.writeText(c);toast("사건번호를 복사했어요 · 인스타 DM에 붙여넣기")}catch(e){toast(c+" · 이 번호를 DM으로 보내주세요")}}
 
 function diffTxt(ref){if(ref==null)return"";const g=ref-0;return g}
 function cmpRow(label,sub,val,min){
