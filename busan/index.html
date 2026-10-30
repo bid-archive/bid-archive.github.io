@@ -309,18 +309,17 @@ html{scroll-behavior:smooth}
 .hot .acts{flex-wrap:nowrap!important}
 .hot .acts .btn{height:34px;padding:0 11px}
 .hot .askbtn{padding:0 12px!important;height:34px;line-height:34px;font-size:13px}
-/* bid PICK = 주인공(주황 카드), 추천 = 보조(흰 카드 + 라임) */
-.pick{background:#ff8a3d!important;color:#121212;box-shadow:0 10px 30px rgba(255,138,61,.22)}
-.pick::before{display:none}
-.pick .row1,.pick .row1 span,.pick .sub,.pick .pv small{color:rgba(18,18,18,.66)!important}
-.pick .row1 span.dd{background:#121212!important;color:#ff8a3d!important;border-color:#121212!important}
-.pick .pv{background:rgba(18,18,18,.08)!important}
-.pick .pv .hl{background:#121212!important;color:#ff8a3d!important}
-.pick .btn.k{background:#ffffff;border-color:#ffffff;color:#121212}
-.pick .btn.dark{background:#121212;border-color:#121212;color:#f4f4f0}
-.pick .askbtn{background:#121212!important;color:#ff8a3d!important}
+/* bid PICK = 흰 카드 + 주황 포인트(테두리·띠·예상가), 추천 = 흰 카드 + 얇은 라임 띠 */
+.pick{background:var(--surface)!important;color:var(--text);border:2px solid #ff8a3d;box-shadow:0 8px 26px rgba(255,138,61,.16)}
+.pick::before{display:block!important;height:6px!important;background:#ff8a3d!important}
+.pick .row1,.pick .row1 span,.pick .sub,.pick .pv small{color:var(--muted)!important}
+.pick .row1 span.dd{background:#ff8a3d!important;color:#121212!important;border-color:#ff8a3d!important}
+.pick .pv{background:var(--raised)!important}
+.pick .pv .hl{background:#ff8a3d!important;color:#121212!important}
+.pick .btn.dark{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.pick .askbtn{background:#ff8a3d!important;color:#121212!important}
 .hot{background:var(--surface)!important;color:var(--text)!important;box-shadow:var(--shadow);overflow:hidden}
-.hot::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--lime)}
+.hot::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:var(--lime)}
 .hot .row1,.hot .case,.hot .sub,.hsave small,.hmeta,.hpred{color:var(--muted)!important}
 .hmeta b{color:var(--text)!important}
 .hrank{font-size:30px!important;color:var(--faint)!important}
