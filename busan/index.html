@@ -203,6 +203,17 @@ td.cheap,td.dear{font-size:12px;font-weight:700}
 .mapview{height:280px;border-radius:14px;overflow:hidden;background:var(--raised);border:1px solid var(--line);position:relative}
 .mapmsg{position:absolute;inset:0;display:grid;place-content:center;gap:10px;text-align:center;font-size:13px;color:var(--muted)}
 .pin{background:#121212;color:#c6f432;font:700 12px/1 "Noto Sans KR",sans-serif;padding:7px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.seg.view button[aria-pressed="true"]{background:var(--lime);color:var(--on-lime)}
+.bigmap{height:min(70vh,640px);border-radius:18px;overflow:hidden;border:1px solid var(--line);background:var(--raised);position:relative;margin-bottom:20px}
+.mpin{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;background:#ffffff;color:#121212;border:1.5px solid #121212;border-radius:10px;padding:4px 8px;font:500 11px/1.25 "Noto Sans KR",sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.2);white-space:nowrap;position:relative}
+.mpin b{font:800 13px/1.2 "Archivo","Noto Sans KR",sans-serif}
+.mpin span{max-width:96px;overflow:hidden;text-overflow:ellipsis;color:#55554e}
+.mpin::after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);border:6px solid transparent;border-top-color:#121212;border-bottom:0}
+.mpin.cand{background:#121212;color:#f4f4f0} .mpin.cand span{color:#b9b9b2}
+.mpin.rec{background:#c6f432;border-color:#121212} .mpin.rec span{color:#121212}
+.mpin:focus-visible{outline:2px solid #c6f432;outline-offset:2px}
+.herobtn{justify-self:start;border:1px solid var(--lime);background:transparent;color:var(--lime);border-radius:12px;height:42px;padding:0 16px;font:700 14px var(--f-body);cursor:pointer}
+.herobtn:hover{background:var(--lime);color:var(--on-lime)}
 .empty{grid-column:1/-1;padding:56px 0;text-align:center;color:var(--muted)}
 
 footer{border-top:1px solid var(--line);margin-top:20px}
@@ -240,6 +251,7 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
     </div>
     <div class="stats" id="stats"></div>
     <div class="days" id="days" role="group" aria-label="매각기일"></div>
+    <button class="herobtn" id="heroMap">🗺 지도에서 물건 위치 보기</button>
   </div>
 </header>
 
@@ -253,6 +265,7 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
   <select id="gu" aria-label="구"><option value="">부산 전체</option></select>
   <div class="seg star" id="pick" role="group" aria-label="추천"></div>
   <select id="sort" aria-label="정렬"><option value="date">매각기일 빠른 순</option><option value="disc">시세 대비 싼 순</option><option value="min">최저가 낮은 순</option></select>
+  <div class="seg view" id="view" role="group" aria-label="보기 방식"><button data-v="list" aria-pressed="true">목록</button><button data-v="map" aria-pressed="false">지도로 보기</button></div>
   <button class="more" id="moreBtn" aria-expanded="false" aria-controls="adv">조건 더보기</button>
   <div class="adv" id="adv" hidden>
     <div class="seg" id="price" role="group" aria-label="최저가"></div>
@@ -263,6 +276,7 @@ footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:
 
 <main class="in">
   <div class="meta"><span id="count"></span><button class="reset" id="reset">조건 초기화</button></div>
+  <div class="bigmap" id="bigmap" hidden><div class="mapmsg">지도 불러오는 중…</div></div>
   <div class="grid" id="list"></div>
 </main>
 
@@ -287,7 +301,7 @@ const SIZES=[["평형 전체",0,999],["~12평",0,40],["12~20평",40,65],["25평�
 const FAILS=[["유찰 전체",-1],["신건",0],["1회+",1],["2회+",2]];
 const PICKS=[["전체"],["후보+추천"],["⭐ 추천"]];
 const WK="일월화수목금토";
-const st={q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date"};
+const st={q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date",view:"list"};
 const $=id=>document.getElementById(id);
 const eok=v=>{if(v==null)return"—";if(v<1e8)return Math.round(v/1e4).toLocaleString()+"만";const e=v/1e8;return (e>=10?e.toFixed(1):e.toFixed(2)).replace(/\.?0+$/,"")+"억"};
 const won=v=>{if(v==null)return"—";const e=Math.floor(v/1e8),m=Math.round(v%1e8/1e4);return (e?e+"억 ":"")+(m?m.toLocaleString()+"만":"")||"0"};
@@ -315,7 +329,7 @@ $("picks").innerHTML=DATA.filter(x=>x.rec).sort((a,b)=>a.date.localeCompare(b.da
   <div class="row1"><span>${x.court} ${x.case}</span><span class="dd ${days(x.date)<=5?"soon":""}">${dlabel(x.date)} · ${md(x.date)}</span></div>
   <div><h3>${esc(x.name)}</h3><div class="sub">${x.gu}${x.dong?" "+x.dong:""}${x.m2?" · "+Math.round(x.m2/3.3058)+"평":""} · 최저가 ${eok(x.min)} · 시세 ${eok(x.mkt)}</div></div>
   <div class="pv"><div><small>예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">DM으로 문의</b>`}</div>
-  <span class="acts"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">지도</a><button class="btn dark open" data-case="${x.case}">상세</button></span></div>
+  <span class="acts"><button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></span></div>
 </article>`).join("");
 $("picks").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
 
@@ -404,7 +418,7 @@ function card(x){
    </div>   <div class="tags">${x.rec?'<span class="tag rec">⭐ 추천</span>':""}${x.cand?'<span class="tag cand">후보</span>':""}${x.rights?'<span class="tag ok">✓ 권리 확인</span>':""}${x.flag?`<span class="tag warn">${esc(x.flag)}</span>`:""}${!x.rights&&!x.rcheck?'<span class="tag">인수조건 확인 전</span>':""}${x.mktN?`<span class="tag">2년 거래 ${x.mktN}건</span>`:""}</div>
    <div class="c-foot">
      <div class="pred"><small>예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">DM으로 문의</b>`}</div>
-     <div class="acts"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">지도</a><button class="btn dark open" data-case="${x.case}">상세</button></div>
+     <div class="acts"><button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></div>
    </div>
   </article>`}
 const COURT_URL="https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml";
@@ -463,6 +477,33 @@ function showRoadview(){
 function closeSheet(){$("sheet").hidden=true;document.body.style.overflow=""}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)closeSheet()});
 
+
+function setView(v){st.view=v;$("view").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));render()}
+$("view").querySelectorAll("button").forEach(b=>b.onclick=()=>setView(b.dataset.v));
+$("heroMap").onclick=()=>{setView("map");document.querySelector(".fbar").scrollIntoView({behavior:"smooth"})};
+let COORD={};try{COORD=JSON.parse(localStorage.getItem("bidCoord")||"{}")}catch(e){}
+function saveCoord(){try{localStorage.setItem("bidCoord",JSON.stringify(COORD))}catch(e){}}
+const BIG={map:null,ovs:[],token:0};
+async function coordOf(x){
+  if(COORD[x.case])return COORD[x.case];
+  const p=await locate(x);if(!p)return null;
+  COORD[x.case]=[p.getLat(),p.getLng()];saveCoord();return COORD[x.case]}
+async function drawPins(r){
+  const el=$("bigmap"),tok=++BIG.token;
+  try{await loadKakao()}catch(e){el.innerHTML='<div class="mapmsg">이 화면에서는 지도를 불러올 수 없어요.<br>bid-archive.github.io/busan 에서 볼 수 있어요.</div>';return}
+  const K=window.kakao;
+  if(!BIG.map){el.innerHTML="";BIG.map=new K.maps.Map(el,{center:new K.maps.LatLng(35.18,129.07),level:8});BIG.map.addControl(new K.maps.ZoomControl(),K.maps.ControlPosition.RIGHT)}
+  else BIG.map.relayout();
+  BIG.ovs.forEach(o=>o.setMap(null));BIG.ovs=[];
+  const bounds=new K.maps.LatLngBounds();let n=0;
+  for(const x of r){
+    const c=await coordOf(x);if(tok!==BIG.token)return;if(!c)continue;
+    const pos=new K.maps.LatLng(c[0],c[1]);bounds.extend(pos);n++;
+    const d=document.createElement("button");d.className="mpin"+(x.rec?" rec":x.cand?" cand":"");
+    d.innerHTML=`<b>${eok(x.min)}</b><span>${esc(x.name.replace(/아파트$/,""))}</span>`;
+    d.onclick=()=>openSheet(x);
+    const ov=new K.maps.CustomOverlay({position:pos,content:d,yAnchor:1.15,clickable:true,zIndex:x.rec?3:x.cand?2:1});ov.setMap(BIG.map);BIG.ovs.push(ov)}
+  if(n)BIG.map.setBounds(bounds,40,40,40,40)}
 function render(){
   const [,p0,p1]=PRICES[st.price],[,s0,s1]=SIZES[st.size],f0=FAILS[st.fail][1],q=st.q.toLowerCase();
   let r=DATA.filter(x=>(!st.gu||x.gu===st.gu)&&(!st.day||x.date===st.day)&&x.min>=p0&&x.min<p1
@@ -473,6 +514,8 @@ function render(){
     :st.sort==="disc"?(a,b)=>(disc(b)??-99)-(disc(a)??-99):(a,b)=>a.min-b.min);
   $("count").innerHTML=`<b>${r.length}</b>건 표시 · 전체 ${DATA.length}건`;
   const L=$("list");
+  $("bigmap").hidden=st.view!=="map";L.hidden=st.view==="map";
+  if(st.view==="map"){drawPins(r);return}
   if(!r.length){L.innerHTML='<div class="empty">조건에 맞는 물건이 없어요. 조건을 넓히거나 초기화해 보세요.</div>';return}
   L.innerHTML=r.map(card).join("");
   L.querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
