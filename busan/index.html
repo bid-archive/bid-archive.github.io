@@ -269,7 +269,9 @@ h1 .big{font-size:1.15em}
 .hsave span{font-size:15px;font-weight:800;color:#ff8a3d}
 .hmeta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--hero-muted)}
 .hmeta b{color:var(--on-hero)}
-.hot .acts{display:flex;gap:6px;margin-top:4px}
+.hot .acts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px}
+.hot .askbtn{margin-top:0;padding:8px 14px}
+.hpred{font-size:13px;color:var(--hero-muted)} .hpred b{color:var(--lime)}
 .hot .btn.dark{background:var(--on-hero);color:var(--hero);border-color:var(--on-hero)}
 .tag.cand{background:#ff8a3d;border-color:#ff8a3d;color:#1a0d00}
 .regions{display:flex;gap:6px;flex-wrap:wrap}
@@ -443,7 +445,7 @@ $("hots").innerHTML=hotList.filter(x=>x.cand).map((x,i)=>`<article class="hot">
    <h3>${esc(x.name)}</h3><div class="sub">${x.gu}${x.dong?" "+x.dong:""}${x.m2?" · "+Math.round(x.m2/3.3058)+"평":""}${x.hh?" · "+x.hh.toLocaleString()+"세대":""}</div>
    <div class="hsave"><small>${x.last?"최근 거래가":"시세"}보다</small><b class="num">${eok(gap(x))}</b><span>싸게</span></div>
    <div class="hmeta"><span>최저가 <b>${eok(x.min)}</b></span><span>${x.last?"최근 거래 "+eok(x.last[2])+" ("+x.last[0].slice(0,5)+")":"시세 "+eok(x.mkt)}</span></div>
-   <div class="acts"><button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></div></div>
+   <div class="acts">${x.pred?`<span class="hpred">예상가 <b>${eok(x.pred)}</b></span>`:`<button class="askbtn" data-case="${x.case}">예상가 받기 →</button>`}<button class="btn k open" data-case="${x.case}">지도</button><button class="btn dark open" data-case="${x.case}">상세</button></div></div>
 </article>`).join("")||'<div class="empty">이번 주는 추천 물건이 없어요.</div>';
 $("hots").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
 
