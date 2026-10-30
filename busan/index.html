@@ -296,7 +296,7 @@ const dlabel=d=>{const n=days(d);return n===0?"D-day":"D-"+n};
 const md=d=>{const t=new Date(d+"T00:00:00");return (t.getMonth()+1)+"."+t.getDate()+" ("+WK[t.getDay()]+")"};
 const disc=x=>x.mkt?Math.round((1-x.min/x.mkt)*100):null;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const kakao=x=>"https://map.kakao.com/link/search/"+encodeURIComponent(x.addr);
+const kmap=x=>"https://map.kakao.com/link/search/"+encodeURIComponent(x.addr);
 
 /* hero */
 $("hTotal").textContent=DATA.length;
@@ -315,7 +315,7 @@ $("picks").innerHTML=DATA.filter(x=>x.rec).sort((a,b)=>a.date.localeCompare(b.da
   <div class="row1"><span>${x.court} ${x.case}</span><span class="dd ${days(x.date)<=5?"soon":""}">${dlabel(x.date)} · ${md(x.date)}</span></div>
   <div><h3>${esc(x.name)}</h3><div class="sub">${x.gu}${x.dong?" "+x.dong:""}${x.m2?" · "+Math.round(x.m2/3.3058)+"평":""} · 최저가 ${eok(x.min)} · 시세 ${eok(x.mkt)}</div></div>
   <div class="pv"><div><small>예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">DM으로 문의</b>`}</div>
-  <span class="acts"><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">지도</a><button class="btn dark open" data-case="${x.case}">상세</button></span></div>
+  <span class="acts"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">지도</a><button class="btn dark open" data-case="${x.case}">상세</button></span></div>
 </article>`).join("");
 $("picks").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
 
@@ -378,7 +378,7 @@ function drawer(x){
     ${x.flag?`<dt>특이사항</dt><dd style="color:var(--warn);font-weight:700">${esc(x.flag)} · 매각물건명세서 확인</dd>`:""}
    </dl>
    ${rows?`<div class="tw tall"><table><thead><tr><th>계약일</th><th>층</th>${x.mixed?"<th>전용</th>":""}<th>금액</th><th>최저가가 싼 금액</th></tr></thead><tbody>${rows}</tbody></table></div>`:""}
-   <div class="links"><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">카카오맵</a><a class="btn" href="https://m.land.naver.com/search/result/${encodeURIComponent(x.gu+" "+x.name)}" target="_blank" rel="noopener">네이버부동산</a><a class="btn court" href="${COURT_URL}" target="_blank" rel="noopener">법원경매정보 (사건번호 복사)</a></div>
+   <div class="links"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">카카오맵</a><a class="btn" href="https://m.land.naver.com/search/result/${encodeURIComponent(x.gu+" "+x.name)}" target="_blank" rel="noopener">네이버부동산</a><a class="btn court" href="${COURT_URL}" target="_blank" rel="noopener">법원경매정보 (사건번호 복사)</a></div>
   </div>`}
 
 function ref(x){
@@ -404,7 +404,7 @@ function card(x){
    </div>   <div class="tags">${x.rec?'<span class="tag rec">⭐ 추천</span>':""}${x.cand?'<span class="tag cand">후보</span>':""}${x.rights?'<span class="tag ok">✓ 권리 확인</span>':""}${x.flag?`<span class="tag warn">${esc(x.flag)}</span>`:""}${!x.rights&&!x.rcheck?'<span class="tag">인수조건 확인 전</span>':""}${x.mktN?`<span class="tag">2년 거래 ${x.mktN}건</span>`:""}</div>
    <div class="c-foot">
      <div class="pred"><small>예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">DM으로 문의</b>`}</div>
-     <div class="acts"><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">지도</a><button class="btn dark open" data-case="${x.case}">상세</button></div>
+     <div class="acts"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">지도</a><button class="btn dark open" data-case="${x.case}">상세</button></div>
    </div>
   </article>`}
 const COURT_URL="https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml";
@@ -414,7 +414,7 @@ function openSheet(x){
    <div class="s-head"><div><div class="case">${x.court} ${x.case} · ${dlabel(x.date)} ${md(x.date)}</div><h2>${esc(x.name)}</h2><div class="c-loc">${x.ho?esc(x.ho)+" · ":""}${x.gu}${x.dong?" "+x.dong:""}${x.m2?` · 전용 ${x.m2}㎡ (${Math.round(x.m2/3.3058)}평)`:""}${x.fail!=null?" · "+(x.fail?"유찰 "+x.fail+"회":"신건"):""}</div></div>
    <button class="x" id="sheetClose" aria-label="닫기">✕</button></div>
    <div class="price s-price"><div><div class="lbl">이번 최저가</div><div class="big">${won(x.min)}</div></div><div class="disc ${d>=20?"hot":""}">${d==null?"—":d+"%"}<small>${d==null?"":(x.basis||"시세")+" 대비"}</small></div></div>
-   <div class="mapbox"><div class="mtabs" role="tablist"><button class="mt" data-v="map" aria-pressed="true">지도</button><button class="mt" data-v="rv" aria-pressed="false">로드뷰</button><a class="mt ext" href="${kakao(x)}" target="_blank" rel="noopener">카카오맵 열기 ↗</a></div>
+   <div class="mapbox"><div class="mtabs" role="tablist"><button class="mt" data-v="map" aria-pressed="true">지도</button><button class="mt" data-v="rv" aria-pressed="false">로드뷰</button><a class="mt ext" href="${kmap(x)}" target="_blank" rel="noopener">카카오맵 열기 ↗</a></div>
      <div class="mapview" id="mapView"><div class="mapmsg">지도 불러오는 중…</div></div><div class="mapview" id="rvView" hidden></div></div>
    <h4>가격 비교</h4>${refs(x)}
    ${drawer(x)}
@@ -438,7 +438,7 @@ function loadKakao(){
       if(Date.now()-t0>5000){MAP.loading=null;no(new Error("kakao unavailable"));return}
       setTimeout(wait,150)})()});
   return MAP.loading}
-function mapFail(x){$("mapView").innerHTML=`<div class="mapmsg">이 화면에서는 지도를 불러올 수 없어요.<br><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">카카오맵에서 보기</a></div>`}
+function mapFail(x){$("mapView").innerHTML=`<div class="mapmsg">이 화면에서는 지도를 불러올 수 없어요.<br><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">카카오맵에서 보기</a></div>`}
 function locate(x){return new Promise(res=>{
   const g=new kakao.maps.services.Geocoder();
   g.addressSearch(x.addr,(r,st)=>{
