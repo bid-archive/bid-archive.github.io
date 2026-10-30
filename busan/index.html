@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="부산 아파트 경매 진행 물건 전체와 시세 비교, bid.archive 추천 물건">
+<meta property="og:title" content="bid.archive · 부산 아파트 경매">
+<meta property="og:description" content="최근 실거래가보다 얼마나 싼지 한눈에. 예상낙찰가는 인스타 DM @bid.archive">
+<title>bid.archive 경매물건</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+/* 레이아웃: 잉크색 헤더(요약 숫자·기일 스트립) → 추천 가로 스크롤 → 고정 필터 바 → 물건 카드 그리드. 라임은 추천·예상가 전용 */
+:root{
+  --bg:#f4f4f0; --surface:#ffffff; --raised:#fafaf7; --ink:#121212; --text:#1b1b19; --muted:#6b6b63; --faint:#9a9a91;
+  --line:#e4e4dd; --line-strong:#cfcfc6; --lime:#c6f432; --on-lime:#121212; --hero:#121212; --on-hero:#f4f4f0; --hero-muted:#8f8f86; --hero-line:#2a2a27;
+  --good:#15803d; --warn:#c2410c; --warn-bg:#fff1e8; --shadow:0 1px 2px rgba(18,18,18,.04),0 8px 24px rgba(18,18,18,.06);
+  --f-num:"Archivo","Noto Sans KR",system-ui,sans-serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e0e0d; --surface:#171716; --raised:#1d1d1b; --ink:#f4f4f0; --text:#ecece6; --muted:#a3a39a; --faint:#76766e;
+  --line:#2a2a27; --line-strong:#3a3a36; --hero:#000000; --hero-line:#222220; --warn:#fb923c; --warn-bg:#2a1a10; --good:#4ade80;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e0e0d; --surface:#171716; --raised:#1d1d1b; --ink:#f4f4f0; --text:#ecece6; --muted:#a3a39a; --faint:#76766e;
+  --line:#2a2a27; --line-strong:#3a3a36; --hero:#000000; --hero-line:#222220; --warn:#fb923c; --warn-bg:#2a1a10; --good:#4ade80;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{word-break:keep-all;overflow-wrap:anywhere;background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.in{max-width:1120px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--lime);outline-offset:2px;border-radius:6px}
+
+/* hero */
+.hero{background:var(--hero);color:var(--on-hero)}
+.hero .in{padding-block:22px 28px;display:grid;gap:26px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-num);font-weight:800;font-size:17px;letter-spacing:-.02em}
+.mark{width:30px;height:30px;border-radius:50%;background:var(--lime);display:grid;place-items:center;color:var(--on-lime);font-weight:900;font-size:12px}
+.updated{font-size:12px;color:var(--hero-muted);text-align:right}
+.updated b{color:var(--on-hero);font-weight:500}
+.headline{display:grid;gap:8px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--lime)}
+h1{margin:0;font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-.04em;line-height:1.15;text-wrap:balance}
+h1 .num{color:var(--lime)}
+.lede{color:var(--hero-muted);font-size:14px;max-width:60ch;margin:0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--hero-line);border-bottom:1px solid var(--hero-line)}
+.stat{padding:16px 4px;display:grid;gap:2px;min-width:0}
+.stat+.stat{border-left:1px solid var(--hero-line);padding-left:18px}
+.stat small{font-size:12px;color:var(--hero-muted)}
+.stat b{font-family:var(--f-num);font-size:clamp(22px,3.4vw,30px);font-weight:800;letter-spacing:-.03em}
+.stat b em{font-style:normal;font-size:.55em;color:var(--hero-muted);font-weight:600;margin-left:3px}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.day{flex:0 0 auto;border:1px solid var(--hero-line);background:transparent;color:var(--on-hero);border-radius:12px;padding:8px 14px;cursor:pointer;text-align:left;display:grid;gap:0}
+.day small{font-size:11px;color:var(--hero-muted)}
+.day span{font-family:var(--f-num);font-weight:800;font-size:15px}
+.day[aria-pressed="true"]{background:var(--lime);color:var(--on-lime);border-color:var(--lime)}
+.day[aria-pressed="true"] small{color:var(--on-lime);opacity:.7}
+
+/* picks */
+.sec{padding-block:30px 6px}
+.sec-h{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
+.sec-h h2{margin:0;font-size:20px;font-weight:900;letter-spacing:-.03em}
+.sec-h p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.picks{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(280px,1fr);gap:14px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.pick{scroll-snap-align:start;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:20px;display:grid;gap:14px;min-width:0;position:relative;overflow:hidden}
+.pick::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--lime)}
+.pick .row1 span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.pick .row1{gap:8px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.pick h3{margin:0;font-size:19px;font-weight:900;letter-spacing:-.03em;line-height:1.3}
+.pick .sub{font-size:13px;color:var(--muted)}
+.pick .pv{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;background:var(--raised);border-radius:14px;padding:14px 16px}
+.pick .pv small{display:block;font-size:12px;color:var(--muted)}
+.pick .pv b{font-family:var(--f-num);font-size:28px;font-weight:900;letter-spacing:-.03em}
+.pick .pv .hl{background:var(--lime);color:var(--on-lime);padding:0 8px;border-radius:8px}
+.pick .pv .ask{font-size:16px;font-weight:800}
+
+/* filters */
+.fbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:24px}
+.fbar .in{padding-block:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px;height:40px}
+.search input{border:0;background:transparent;font:inherit;font-size:14px;color:var(--text);width:100%;outline:none}
+.search svg{flex:0 0 auto;color:var(--faint)}
+select{font:inherit;font-size:13px;height:40px;padding:0 30px 0 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 15px) 18px,calc(100% - 10px) 18px;background-size:5px 5px;background-repeat:no-repeat}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;height:40px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:0 12px;font-size:13px;cursor:pointer;color:var(--muted);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:700}
+.seg.star button[aria-pressed="true"]{background:var(--lime);color:var(--on-lime)}
+.more{border:1px solid var(--line);background:var(--surface);border-radius:12px;height:40px;padding:0 14px;font-size:13px;cursor:pointer}
+.more[aria-expanded="true"]{border-color:var(--ink)}
+.adv{display:flex;flex-wrap:wrap;gap:8px;width:100%}
+
+/* list */
+.meta{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-block:18px 12px;font-size:13px;color:var(--muted)}
+.meta b{color:var(--text);font-family:var(--f-num)}
+.reset{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px}
+.grid{align-items:stretch;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:14px;padding-bottom:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:14px;min-width:0;transition:border-color .15s,box-shadow .15s}
+.card:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
+.card.rec{border-color:var(--lime);box-shadow:0 0 0 1px var(--lime)}
+.c-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dd{font-family:var(--f-num);font-weight:800;font-size:12px;padding:3px 9px;border-radius:999px;background:var(--raised);border:1px solid var(--line);white-space:nowrap}
+.dd.soon{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.case{white-space:nowrap;font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.c-name{display:grid;gap:3px}
+.c-name h3{margin:0;font-size:18px;font-weight:900;letter-spacing:-.03em;line-height:1.3}
+.ho{font-size:14px;font-weight:700;color:var(--text)}
+.c-loc{font-size:13px;color:var(--muted)}
+.price{display:grid;grid-template-columns:1fr auto;align-items:end;gap:6px 12px}
+.price .lbl{font-size:12px;color:var(--muted)}
+.price .big{font-family:var(--f-num);font-size:30px;font-weight:900;letter-spacing:-.035em;line-height:1.05}
+.disc{font-family:var(--f-num);font-weight:900;font-size:20px;letter-spacing:-.02em;text-align:right}
+.disc small{display:block;font-family:var(--f-body);font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0}
+.disc.hot{color:var(--good)}
+.gauge{grid-column:1/-1;display:grid;gap:5px}
+.track{position:relative;height:6px;border-radius:3px;background:var(--raised);border:1px solid var(--line)}
+.fill{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--ink)}
+.tick{position:absolute;top:-4px;width:2px;height:12px;background:var(--muted);right:0}
+.gl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.gl b{font-family:var(--f-num);color:var(--text);font-weight:700}
+.tags{align-items:flex-start;display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 8px;background:var(--raised);border:1px solid var(--line);color:var(--muted)}
+.tag.rec{background:var(--lime);border-color:var(--lime);color:var(--on-lime)}
+.tag.cand{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.tag.ok{color:var(--good)}
+.tag.warn{color:var(--warn);background:var(--warn-bg);border-color:transparent}
+.c-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.pred small{display:block;font-size:11px;color:var(--muted)}
+.pred b{font-family:var(--f-num);font-size:18px;font-weight:900}
+.pred b.hl{background:var(--lime);color:var(--on-lime);padding:0 6px;border-radius:6px}
+.pred .ask{font-family:var(--f-body);font-size:14px}
+.acts{display:flex;gap:6px}
+.btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:10px;height:34px;padding:0 11px;font-size:12.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;color:var(--text);text-decoration:none;white-space:nowrap}
+.btn.k{background:#fee500;border-color:#fee500;color:#191919}
+.btn.dark{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.drawer{display:grid;gap:14px;background:var(--raised);border-radius:12px;padding:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:500;font-size:11.5px}
+.links{display:flex;flex-wrap:wrap;gap:6px}
+.cmp{display:grid;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.cr{display:grid;grid-template-columns:minmax(0,1.3fr) auto minmax(0,1fr);gap:10px;align-items:center;padding:8px 12px;font-size:13px}
+.cr+.cr{border-top:1px solid var(--line)}
+.cl{color:var(--muted);min-width:0} .cl small{display:block;font-size:11px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv{font-family:var(--f-num);font-weight:700;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.cd{text-align:right;font-size:12px;font-weight:700;white-space:nowrap}
+.cheap{color:var(--good)} .dear{color:var(--warn)}
+.cr.none{display:block;color:var(--muted);font-size:12.5px}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 8px 4px}
+.ch{font-size:11.5px;color:var(--muted);margin:0 4px 4px}
+.tall{max-height:260px;overflow-y:auto}
+td.cheap,td.dear{font-size:12px;font-weight:700}
+.grid{grid-auto-rows:1fr}
+.card{display:flex;flex-direction:column}
+.c-name h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ho.none{color:var(--faint);font-weight:500}
+.c-loc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.disc small{white-space:nowrap}
+.tags{min-height:24px}
+.c-foot{margin-top:auto}
+.sheet{position:fixed;inset:0;z-index:30;display:flex;justify-content:center;align-items:flex-end}
+.scrim{position:absolute;inset:0;background:rgba(10,10,10,.5)}
+.panel{position:relative;background:var(--surface);width:min(640px,100%);max-height:calc(92vh - env(safe-area-inset-top,0px));overflow-y:auto;border-radius:22px 22px 0 0;padding:22px max(20px,env(safe-area-inset-left,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+@media (min-width:700px){.sheet{align-items:center}.panel{border-radius:22px;max-height:88vh}}
+.s-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.s-head h2{margin:4px 0 2px;font-size:22px;font-weight:900;letter-spacing:-.03em}
+.x{border:1px solid var(--line);background:var(--raised);border-radius:50%;width:36px;height:36px;flex:0 0 auto;cursor:pointer;font-size:14px;color:var(--text)}
+.s-price{background:var(--raised);border-radius:14px;padding:14px 16px}
+.panel h4{margin:0 0 -8px;font-size:13px;color:var(--muted);font-weight:700}
+.panel .drawer{background:transparent;padding:0}
+.pv-box{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:14px}
+.pick .pv .acts{display:flex;gap:6px}
+.save{display:flex;align-items:center;flex-wrap:nowrap;white-space:nowrap;gap:6px;font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+.save b{font-family:var(--f-num);font-weight:900;font-size:16px}
+.save span{margin-left:auto}
+.save span{font-family:var(--f-num);font-size:12px;font-weight:800;padding:2px 7px;border-radius:999px;background:var(--raised);border:1px solid var(--line)}
+.save.hot{color:var(--good)} .save.hot span{background:var(--good);color:var(--surface);border-color:var(--good)}
+.save.none{color:var(--muted);font-weight:500;font-size:14px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--raised);border-radius:12px;padding:12px 14px}
+.pair .vs{border-left:1px solid var(--line);padding-left:12px;min-width:0}
+.pair .lbl{font-size:12px;color:var(--muted)}
+.pair .big{font-family:var(--f-num);font-size:24px;font-weight:900;letter-spacing:-.035em;line-height:1.35;white-space:nowrap}
+.pair .mid{font-family:var(--f-num);font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--muted);line-height:1.35}
+.pair .mid.none{font-size:15px}
+.pair .when{font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mapbox{display:grid;gap:8px}
+.mtabs{display:flex;gap:6px;align-items:center}
+.mt{border:1px solid var(--line);background:var(--surface);border-radius:999px;height:32px;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);text-decoration:none;display:inline-flex;align-items:center}
+.mt[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mt.ext{margin-left:auto;font-weight:500}
+.mapview{height:280px;border-radius:14px;overflow:hidden;background:var(--raised);border:1px solid var(--line);position:relative}
+.mapmsg{position:absolute;inset:0;display:grid;place-content:center;gap:10px;text-align:center;font-size:13px;color:var(--muted)}
+.pin{background:#121212;color:#c6f432;font:700 12px/1 "Noto Sans KR",sans-serif;padding:7px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.empty{grid-column:1/-1;padding:56px 0;text-align:center;color:var(--muted)}
+
+footer{border-top:1px solid var(--line);margin-top:20px}
+footer .in{padding-block:24px 40px;display:grid;gap:14px;font-size:12.5px;color:var(--muted)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.rule b{display:block;color:var(--text);font-size:13px;margin-bottom:4px}
+.draft{font-size:12px;color:var(--faint)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-size:13px;box-shadow:var(--shadow);z-index:20}
+@media (max-width:640px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stat:nth-child(3){border-left:0;padding-left:4px}
+  .stat:nth-child(n+3){border-top:1px solid var(--hero-line)}
+  .seg button{padding:0 9px}
+  .updated .src{display:none}
+  .save{flex-wrap:wrap;white-space:normal}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+<style>:root{color-scheme:light}html,body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+
+
+<header class="hero">
+  <div class="in">
+    <div class="nav">
+      <div class="brand"><span class="mark">bid</span>bid.archive</div>
+      <div class="updated">마지막 업데이트 <b class="num">10.30 18:30</b><span class="src"><br>경매 대법원 · 실거래 국토부</span></div>
+    </div>
+    <div class="headline">
+      <span class="eyebrow">BUSAN · APARTMENT AUCTION</span>
+      <h1>부산 아파트 경매 <span class="num" id="hTotal">0</span>건,<br>시세보다 얼마나 싼지 한눈에</h1>
+      <p class="lede">진행 중인 물건을 모두 보여주고, 그중 시세 대비 싸고 거래가 충분한 물건은 후보로, 권리까지 직접 확인한 물건은 추천으로 표시합니다.</p>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="days" id="days" role="group" aria-label="매각기일"></div>
+  </div>
+</header>
+
+<section class="sec"><div class="in">
+  <div class="sec-h"><div><h2>bid.archive 추천</h2><p>권리·점유까지 직접 확인하고 예상낙찰가를 낸 물건</p></div></div>
+  <div class="picks" id="picks"></div>
+</div></section>
+
+<div class="fbar"><div class="in">
+  <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="단지명, 동, 사건번호" autocomplete="off"></label>
+  <select id="gu" aria-label="구"><option value="">부산 전체</option></select>
+  <div class="seg star" id="pick" role="group" aria-label="추천"></div>
+  <select id="sort" aria-label="정렬"><option value="date">매각기일 빠른 순</option><option value="disc">시세 대비 싼 순</option><option value="min">최저가 낮은 순</option></select>
+  <button class="more" id="moreBtn" aria-expanded="false" aria-controls="adv">조건 더보기</button>
+  <div class="adv" id="adv" hidden>
+    <div class="seg" id="price" role="group" aria-label="최저가"></div>
+    <div class="seg" id="size" role="group" aria-label="평형"></div>
+    <div class="seg" id="fail" role="group" aria-label="유찰"></div>
+  </div>
+</div></div>
+
+<main class="in">
+  <div class="meta"><span id="count"></span><button class="reset" id="reset">조건 초기화</button></div>
+  <div class="grid" id="list"></div>
+</main>
+
+<footer><div class="in">
+  <div class="rules">
+    <div class="rule"><b>가격 비교</b>같은 단지·같은 평형 실거래(국토부, 직거래·해제 제외)의 최근 거래, 비슷한 층(±3층) 최근 거래, 1년 평균·최저, 감정가를 모두 최저가와 비교합니다. 할인율은 1년 평균 기준입니다.</div>
+    <div class="rule"><b>후보</b>1년 평균보다 20% 이상 싸고, 1회 이상 유찰, 1년 거래 3건 이상, 특이사항 없음, 1층 제외. 권리는 아직 확인 전입니다.</div>
+    <div class="rule"><b>⭐ 추천</b>후보 중 bid.archive가 등기·임차인·점유까지 확인한 물건입니다. 예상낙찰가는 사건번호를 인스타 DM(@bid.archive)으로 보내면 알려드립니다.</div>
+  </div>
+  <div>입찰 전 매각물건명세서와 현장을 반드시 직접 확인하세요. 이 페이지는 공개자료를 정리한 참고 정보이며 투자 권유가 아닙니다.</div>
+  <div class="draft">시안 · 부산지법 본원 40건(11/3~11/11 기일) + 동부·서부지원 분석 완료 4건. 나머지 물건은 수집 중입니다.</div>
+</div></footer>
+<div class="sheet" id="sheet" hidden><div class="scrim" onclick="closeSheet()"></div><div class="panel" role="dialog" aria-modal="true" aria-label="물건 상세" id="sheetBody"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const TODAY=new Date("2026-10-30T00:00:00");
+const DATA=[{"court": "부산", "case": "2024타경213", "name": "연산자이", "gu": "연제구", "dong": "연산동", "ho": "119동 3층 302호", "m2": 161.7, "fl": 3, "date": "2026-11-06", "appr": 958000000, "min": 469420000, "fail": 1, "flag": "", "addr": "부산 연제구 연산동 2262", "mkt": 798750000, "mktN": 17, "conf": true, "tr": [["26.09.30", 19, 735000000], ["26.07.13", 24, 790000000], ["26.04.12", 15, 920000000], ["25.12.08", 5, 750000000], ["25.09.20", 3, 730000000], ["25.09.06", 13, 810000000], ["25.08.28", 1, 770000000], ["25.08.25", 12, 747000000], ["25.08.18", 2, 700000000], ["25.08.14", 20, 700000000], ["25.07.08", 14, 710000000], ["25.07.07", 12, 735000000], ["25.05.25", 15, 755000000], ["25.05.21", 15, 740000000], ["25.05.14", 7, 700000000], ["25.02.11", 22, 780000000], ["24.11.12", 13, 750000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.09.30", 19, 735000000], "sim": ["25.12.08", 5, 750000000], "simN": 1, "y1": {"n": 4, "avg": 798750000, "lo": 735000000, "hi": 920000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2024타경58939", "name": "태영아너스", "gu": "부산진구", "dong": "개금동", "ho": "4층 406호", "m2": null, "fl": 4, "date": "2026-11-11", "appr": 129000000, "min": 129000000, "fail": 0, "flag": "", "addr": "부산 부산진구 개금동 171-51", "mkt": 70000000, "mktN": 4, "conf": true, "tr": [["26.01.12", 6, 68000000, 16], ["26.01.12", 9, 76000000, 17], ["26.01.12", 6, 68000000, 17], ["26.01.12", 5, 68000000, 16]], "rec": false, "pred": null, "mixed": false, "last": ["26.01.12", 6, 68000000], "simN": 3, "y1": {"n": 4, "avg": 70000000, "lo": 68000000, "hi": 76000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2024타경60796", "name": "에덴금호타운", "gu": "영도구", "dong": "동삼동", "ho": "101동 25층 2508호", "m2": null, "fl": 25, "date": "2026-11-03", "appr": 261000000, "min": 261000000, "fail": 0, "flag": "호수 불일치", "addr": "부산 영도구 동삼동 680-12", "mkt": null, "mktN": 12, "conf": false, "tr": [["26.06.22", 12, 170000000, 84], ["26.05.01", 24, 205000000, 121], ["26.03.19", 2, 140000000, 84], ["26.01.08", 23, 120000000, 84], ["25.11.27", 16, 155000000, 84], ["25.10.24", 25, 105000000, 59], ["25.04.25", 8, 165000000, 84], ["25.04.24", 1, 136000000, 84], ["25.02.25", 20, 145000000, 84], ["25.02.22", 24, 165000000, 84], ["25.02.11", 10, 104000000, 59], ["24.11.10", 18, 108000000, 59]], "rec": false, "pred": null, "mixed": true, "cand": false}, {"court": "부산", "case": "2024타경61553", "name": "연지센트럴파크", "gu": "부산진구", "dong": "연지동", "ho": "10층 1001호", "m2": null, "fl": 10, "date": "2026-11-03", "appr": 188000000, "min": 15483000, "fail": 7, "flag": "", "addr": "부산 부산진구 연지동 41-7", "mkt": 180000000, "mktN": 2, "conf": false, "tr": [["25.12.30", 7, 180000000, 44], ["24.11.02", 6, 167000000, 44]], "rec": false, "pred": null, "mixed": false, "last": ["25.12.30", 7, 180000000], "simN": 1, "y1": {"n": 1, "avg": 180000000, "lo": 180000000, "hi": 180000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2024타경61690", "name": "신개금엘지아파트", "gu": "부산진구", "dong": "개금동", "ho": "202동 5층 502호", "m2": 85.0, "fl": 5, "date": "2026-11-03", "appr": 392000000, "min": 274400000, "fail": 1, "flag": "", "addr": "부산 부산진구 개금동 455", "mkt": 348173913, "mktN": 42, "conf": true, "tr": [["26.10.14", 26, 348000000], ["26.09.11", 5, 335000000], ["26.09.09", 15, 335000000], ["26.09.01", 12, 355000000], ["26.09.01", 5, 352500000], ["26.08.21", 25, 349000000], ["26.07.31", 13, 344000000], ["26.05.23", 8, 338000000], ["26.05.15", 8, 350000000], ["26.04.16", 6, 330000000], ["26.04.10", 13, 364000000], ["26.03.31", 4, 310000000], ["26.03.24", 10, 360000000], ["26.02.25", 21, 353000000], ["26.02.24", 22, 376500000], ["26.02.21", 11, 341000000], ["26.02.20", 23, 420000000], ["26.02.11", 8, 320000000], ["26.01.15", 8, 315000000], ["26.01.13", 24, 347000000], ["25.12.19", 9, 345000000], ["25.12.06", 23, 355000000], ["25.10.31", 17, 365000000], ["25.10.22", 7, 370000000], ["25.10.16", 8, 323000000], ["25.09.27", 21, 340000000], ["25.09.02", 25, 335000000], ["25.07.28", 21, 310000000], ["25.07.28", 23, 325000000], ["25.07.24", 2, 324000000], ["25.07.05", 10, 350000000], ["25.05.19", 25, 338000000], ["25.05.17", 15, 352000000], ["25.05.16", 8, 305000000], ["25.03.30", 6, 360000000], ["25.03.28", 2, 300000000], ["25.02.25", 7, 328000000], ["25.02.18", 6, 337000000], ["25.01.01", 26, 330000000], ["24.12.09", 6, 300000000], ["24.11.13", 22, 375000000], ["24.11.02", 3, 317000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.10.14", 26, 348000000], "sim": ["26.09.11", 5, 335000000], "simN": 8, "y1": {"n": 23, "avg": 348173913, "lo": 310000000, "hi": 420000000}, "basis": "1년 평균", "cand": true}, {"court": "부산", "case": "2024타경66374", "name": "개금역대상웰리움", "gu": "부산진구", "dong": "개금동", "ho": "15층 1502호", "m2": null, "fl": 15, "date": "2026-11-10", "appr": 883000000, "min": 302869000, "fail": 3, "flag": "", "addr": "부산 부산진구 개금동 165-2", "mkt": null, "mktN": 13, "conf": false, "tr": [["26.07.03", 14, 208000000, 52], ["26.06.28", 12, 327000000, 85], ["26.04.04", 9, 190000000, 52], ["26.01.22", 14, 280000000, 85], ["25.12.29", 6, 270000000, 85], ["25.12.13", 9, 280000000, 82], ["25.11.05", 7, 215000000, 60], ["25.10.27", 10, 280000000, 85], ["25.08.06", 6, 185000000, 52], ["25.06.14", 5, 225000000, 60], ["25.03.16", 10, 227000000, 60], ["25.03.01", 4, 200000000, 60], ["24.12.23", 4, 250000000, 81]], "rec": false, "pred": null, "mixed": true, "cand": false}, {"court": "부산", "case": "2025타경1275", "name": "스파타운", "gu": "동래구", "dong": "온천동", "ho": "9층 902호", "m2": 128.0, "fl": 9, "date": "2026-11-10", "appr": 634000000, "min": 217462000, "fail": 3, "flag": "위반건축", "addr": "부산 동래구 온천동 165-2", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경1824", "name": "구서동쌍용예가", "gu": "금정구", "dong": "구서동", "ho": "104동 2층 203호", "m2": 157.8, "fl": 2, "date": "2026-11-03", "appr": 770000000, "min": 770000000, "fail": 0, "flag": "", "addr": "부산 금정구 구서동 1053", "mkt": 820000000, "mktN": 2, "conf": false, "tr": [["26.09.18", 23, 820000000], ["25.07.09", 16, 800000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.09.18", 23, 820000000], "simN": 0, "y1": {"n": 1, "avg": 820000000, "lo": 820000000, "hi": 820000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경3103", "name": "대동레미안센트럴시티", "gu": "부산진구", "dong": "부전동", "ho": "5층 에이-505호", "m2": 32.3, "fl": 5, "date": "2026-11-04", "appr": 201000000, "min": 98490000, "fail": 2, "flag": "", "addr": "부산 부산진구 부전동 474-51", "mkt": 135000000, "mktN": 1, "conf": false, "tr": [["26.06.02", 13, 135000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.06.02", 13, 135000000], "simN": 0, "y1": {"n": 1, "avg": 135000000, "lo": 135000000, "hi": 135000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경3639", "name": "신우아파트", "gu": "동구", "dong": "초량동", "ho": "4층 406호", "m2": 62.1, "fl": 4, "date": "2026-11-10", "appr": 124000000, "min": 60760000, "fail": 2, "flag": "", "addr": "부산 동구 초량동 1143-15", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경3776", "name": "거제유림아시아드", "gu": "연제구", "dong": "거제동", "ho": "113동 12층 1209호", "m2": 59.9, "fl": 12, "date": "2026-11-06", "appr": 218000000, "min": 218000000, "fail": 0, "flag": "", "addr": "부산 연제구 거제동 714-144", "mkt": 257676470, "mktN": 25, "conf": true, "tr": [["26.07.08", 17, 235000000], ["26.07.08", 17, 240000000], ["26.04.09", 15, 240000000], ["26.03.20", 5, 330000000], ["26.03.10", 16, 239000000], ["26.03.08", 11, 230000000], ["26.03.06", 18, 300000000], ["26.02.25", 13, 240000000], ["26.02.25", 5, 240000000], ["26.02.13", 18, 225000000], ["26.02.02", 14, 212500000], ["26.02.01", 21, 320000000], ["26.01.30", 17, 208000000], ["26.01.24", 11, 293000000], ["26.01.16", 16, 210000000], ["25.11.29", 17, 318000000], ["25.11.22", 9, 300000000], ["25.10.20", 11, 215000000], ["25.09.23", 18, 235000000], ["25.06.17", 12, 212500000], ["25.05.19", 4, 220000000], ["25.03.20", 16, 220000000], ["25.03.07", 20, 210000000], ["25.03.06", 10, 215000000], ["24.12.06", 20, 235000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.07.08", 17, 235000000], "sim": ["26.04.09", 15, 240000000], "simN": 6, "y1": {"n": 17, "avg": 257676470, "lo": 208000000, "hi": 330000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경3820", "name": "성무아이반스타", "gu": "동구", "dong": "범일동", "ho": "2층 201호", "m2": 49.8, "fl": 2, "date": "2026-11-04", "appr": 187000000, "min": 187000000, "fail": 0, "flag": "", "addr": "부산 동구 범일동 154", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경3844", "name": "한나라빌", "gu": "영도구", "dong": "동삼동", "ho": "7동 4층 401호", "m2": 85.0, "fl": 4, "date": "2026-11-06", "appr": 172000000, "min": 84280000, "fail": 2, "flag": "", "addr": "부산 영도구 동삼동 325-232", "mkt": 120000000, "mktN": 2, "conf": false, "tr": [["26.08.20", 3, 120000000], ["25.03.27", 5, 170000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.08.20", 3, 120000000], "simN": 1, "y1": {"n": 1, "avg": 120000000, "lo": 120000000, "hi": 120000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경3967", "name": "구서동쌍용예가", "gu": "금정구", "dong": "구서동", "ho": "205동 1층 101호", "m2": 157.8, "fl": 1, "date": "2026-11-04", "appr": 950000000, "min": 950000000, "fail": 0, "flag": "", "addr": "부산 금정구 구서동 1059", "mkt": 860000000, "mktN": 20, "conf": true, "tr": [["26.10.09", 4, 855000000], ["26.08.19", 2, 800000000], ["26.06.03", 8, 960000000], ["26.01.21", 5, 945000000], ["25.12.31", 9, 700000000], ["25.12.09", 6, 900000000], ["25.10.16", 21, 940000000], ["25.07.23", 9, 925000000], ["25.07.12", 5, 970000000], ["25.06.18", 6, 965000000], ["25.06.02", 19, 980000000], ["25.05.17", 25, 1120000000], ["25.04.29", 10, 1020000000], ["25.03.31", 13, 860000000], ["25.03.19", 23, 1025000000], ["25.02.07", 18, 1090000000], ["25.02.07", 18, 1090000000], ["25.01.17", 13, 990000000], ["24.12.28", 4, 1000000000], ["24.11.29", 21, 1010000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.10.09", 4, 855000000], "simN": 2, "y1": {"n": 6, "avg": 860000000, "lo": 700000000, "hi": 960000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경3981", "name": "서면노르웨이아침", "gu": "부산진구", "dong": "전포동", "ho": "16층 1619호", "m2": 30.5, "fl": 16, "date": "2026-11-06", "appr": 90000000, "min": 44100000, "fail": 2, "flag": "", "addr": "부산 부산진구 전포동 892-21", "mkt": 54900000, "mktN": 10, "conf": true, "tr": [["26.10.29", 17, 50000000], ["26.08.21", 8, 50000000], ["26.08.19", 5, 51000000], ["26.07.06", 10, 61500000], ["26.04.24", 14, 62000000], ["25.07.15", 10, 56000000], ["25.06.14", 10, 55000000], ["25.06.13", 8, 60000000], ["25.03.28", 4, 52000000], ["24.12.08", 7, 60000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.10.29", 17, 50000000], "simN": 2, "y1": {"n": 5, "avg": 54900000, "lo": 50000000, "hi": 62000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경4175", "name": "더샵 센트럴스타", "gu": "부산진구", "dong": "부전동", "ho": "디동 41층 4103호", "m2": 183.4, "fl": 41, "date": "2026-11-11", "appr": 1300000000, "min": 1300000000, "fail": 0, "flag": "", "addr": "부산 부산진구 부전동 537-9", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경4632", "name": "한웅인터빌", "gu": "부산진구", "dong": "전포동", "ho": "16층 1604호", "m2": 35.2, "fl": 16, "date": "2026-11-06", "appr": 76000000, "min": 37240000, "fail": 2, "flag": "", "addr": "부산 부산진구 전포동 362-62", "mkt": 60000000, "mktN": 3, "conf": false, "tr": [["26.07.18", 14, 58000000], ["26.04.14", 17, 62000000], ["25.04.25", 10, 75000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.07.18", 14, 58000000], "simN": 2, "y1": {"n": 2, "avg": 60000000, "lo": 58000000, "hi": 62000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경4847", "name": "로얄팰리스", "gu": "금정구", "dong": "청룡동", "ho": "103동 1층 101호", "m2": 133.1, "fl": 1, "date": "2026-11-06", "appr": 511000000, "min": 357700000, "fail": 1, "flag": "", "addr": "부산 금정구 청룡동 315", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경5062", "name": "거제1차현대홈타운", "gu": "연제구", "dong": "거제동", "ho": "111동 16층 1601호", "m2": 85.0, "fl": 16, "date": "2026-11-06", "appr": 600000000, "min": 600000000, "fail": 0, "flag": "", "addr": "부산 연제구 거제동 1481", "mkt": 681565217, "mktN": 56, "conf": true, "tr": [["26.10.17", 10, 693000000], ["26.09.29", 21, 720000000], ["26.09.19", 8, 670000000], ["26.09.18", 6, 665000000], ["26.08.27", 11, 660000000], ["26.07.17", 11, 660000000], ["26.07.06", 4, 648000000], ["26.06.20", 24, 705000000], ["26.06.12", 6, 660000000], ["26.05.25", 14, 700000000], ["26.04.18", 26, 710000000], ["26.04.17", 10, 630000000], ["26.04.07", 15, 640000000], ["26.03.05", 21, 707000000], ["26.02.28", 18, 680000000], ["26.02.02", 20, 695000000], ["25.12.29", 21, 700000000], ["25.12.13", 11, 715000000], ["25.12.04", 28, 688000000], ["25.11.29", 12, 720000000], ["25.11.19", 13, 655000000], ["25.11.18", 24, 680000000], ["25.11.06", 17, 675000000], ["25.10.26", 8, 650000000], ["25.10.25", 1, 530000000], ["25.10.24", 10, 600000000], ["25.10.20", 5, 600000000], ["25.10.12", 26, 670000000], ["25.09.26", 1, 538000000], ["25.09.18", 29, 700000000], ["25.09.10", 28, 615000000], ["25.08.08", 5, 564000000], ["25.08.02", 10, 565000000], ["25.07.31", 14, 570000000], ["25.07.26", 1, 495000000], ["25.07.02", 5, 540000000], ["25.06.29", 9, 562000000], ["25.06.26", 21, 590000000], ["25.06.23", 23, 590000000], ["25.06.21", 14, 560000000], ["25.05.26", 8, 560000000], ["25.05.23", 11, 560000000], ["25.05.17", 12, 562000000], ["25.05.16", 23, 600000000], ["25.04.24", 17, 610000000], ["25.04.23", 2, 520000000], ["25.04.20", 19, 560000000], ["25.03.08", 20, 592000000], ["25.03.05", 6, 570000000], ["25.02.08", 11, 560000000], ["25.02.03", 28, 610000000], ["25.01.18", 26, 590000000], ["25.01.16", 8, 555000000], ["24.12.22", 19, 580000000], ["24.12.11", 2, 520000000], ["24.12.06", 17, 605000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.10.17", 10, 693000000], "sim": ["26.05.25", 14, 700000000], "simN": 5, "y1": {"n": 23, "avg": 681565217, "lo": 630000000, "hi": 720000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경5437", "name": "안락에스케이아파트", "gu": "동래구", "dong": "안락동", "ho": "109동 13층 1309호", "m2": 85.0, "fl": 13, "date": "2026-11-06", "appr": 411000000, "min": 287700000, "fail": 1, "flag": "", "addr": "부산 동래구 안락동 472-57", "mkt": 389428571, "mktN": 61, "conf": true, "tr": [["26.10.08", 25, 380000000], ["26.09.30", 25, 360000000], ["26.09.22", 15, 425000000], ["26.09.03", 13, 380000000], ["26.09.02", 16, 445000000], ["26.09.01", 4, 395000000], ["26.06.29", 14, 408000000], ["26.06.27", 20, 397000000], ["26.06.17", 5, 365000000], ["26.06.16", 7, 380000000], ["26.05.14", 6, 399000000], ["26.05.11", 17, 350000000], ["26.04.30", 18, 410000000], ["26.04.18", 12, 384000000], ["26.03.28", 5, 368000000], ["26.03.16", 25, 405000000], ["26.03.07", 24, 405000000], ["26.02.22", 18, 410000000], ["26.02.20", 24, 395000000], ["26.02.02", 4, 400000000], ["26.01.10", 11, 388000000], ["25.12.04", 5, 370000000], ["25.11.20", 7, 365000000], ["25.11.11", 12, 408000000], ["25.11.08", 11, 360000000], ["25.11.06", 7, 390000000], ["25.11.06", 23, 387000000], ["25.11.05", 8, 375000000], ["25.10.25", 4, 348000000], ["25.10.23", 24, 378000000], ["25.10.10", 22, 395000000], ["25.09.29", 19, 388000000], ["25.09.25", 19, 378000000], ["25.09.13", 23, 355000000], ["25.09.01", 7, 395000000], ["25.08.21", 23, 427000000], ["25.08.18", 23, 378000000], ["25.07.19", 19, 395000000], ["25.07.02", 24, 389000000], ["25.06.27", 16, 410000000], ["25.06.25", 24, 390000000], ["25.05.13", 24, 408000000], ["25.05.12", 4, 360000000], ["25.05.11", 11, 395000000], ["25.05.07", 6, 369000000], ["25.04.21", 11, 397000000], ["25.04.19", 8, 388000000], ["25.04.14", 1, 319000000], ["25.04.13", 20, 423000000], ["25.04.05", 16, 360000000], ["25.03.30", 13, 400000000], ["25.03.29", 21, 369000000], ["25.03.28", 21, 367000000], ["25.03.25", 25, 380000000], ["25.03.14", 12, 390000000], ["25.03.01", 13, 370000000], ["25.02.21", 1, 319000000], ["25.01.02", 1, 378000000], ["24.11.16", 8, 380000000], ["24.11.02", 11, 378000000], ["24.11.02", 15, 398000000]], "rec": true, "pred": 350000000, "mixed": false, "last": ["26.10.08", 25, 380000000], "sim": ["26.09.22", 15, 425000000], "simN": 8, "y1": {"n": 28, "avg": 389428571, "lo": 350000000, "hi": 445000000}, "basis": "1년 평균", "rights": true, "note": "같은 단지 5월 낙찰 18명 입찰", "cand": false}, {"court": "부산", "case": "2025타경20498", "name": "대동레미안센트럴시티5", "gu": "부산진구", "dong": "범천동", "ho": "9층 903호", "m2": null, "fl": 9, "date": "2026-11-06", "appr": 260000000, "min": 2519000, "fail": 13, "flag": "", "addr": "부산 부산진구 범천동 849-2", "mkt": null, "mktN": 2, "conf": false, "tr": [["26.10.12", 15, 120000000, 23], ["25.05.08", 9, 245000000, 44]], "rec": false, "pred": null, "mixed": true, "cand": false}, {"court": "부산", "case": "2025타경21503", "name": "태평양아파트", "gu": "금정구", "dong": "구서동", "ho": "12층 1201호", "m2": 84.7, "fl": 12, "date": "2026-11-10", "appr": 169000000, "min": 118300000, "fail": 1, "flag": "", "addr": "부산 금정구 구서동 75", "mkt": 190000000, "mktN": 2, "conf": false, "tr": [["25.03.29", 6, 190000000], ["25.03.19", 9, 170000000]], "rec": false, "pred": null, "mixed": false, "last": ["25.03.29", 6, 190000000], "sim": ["25.03.19", 9, 170000000], "simN": 0, "basis": "최근 거래", "cand": false}, {"court": "부산", "case": "2025타경21508", "name": "대동레미안센트럴시티", "gu": "부산진구", "dong": "부전동", "ho": "12층 에이-1205호", "m2": 32.3, "fl": 12, "date": "2026-11-11", "appr": 206000000, "min": 24236000, "fail": 6, "flag": "재매각", "addr": "부산 부산진구 부전동 474-51", "mkt": 135000000, "mktN": 1, "conf": false, "tr": [["26.06.02", 13, 135000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.06.02", 13, 135000000], "simN": 1, "y1": {"n": 1, "avg": 135000000, "lo": 135000000, "hi": 135000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경21625", "name": "그린시티빌", "gu": "동구", "dong": "초량동", "ho": "9층 901호", "m2": 84.0, "fl": 9, "date": "2026-11-03", "appr": 257000000, "min": 179900000, "fail": 1, "flag": "", "addr": "부산 동구 초량동 106-10", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경21666", "name": "삼정그린코아", "gu": "동래구", "dong": "사직동", "ho": "110동 8층 802호", "m2": 116.2, "fl": 8, "date": "2026-11-03", "appr": 365000000, "min": 178850000, "fail": 2, "flag": "", "addr": "부산 동래구 사직동 981-100", "mkt": 349000000, "mktN": 10, "conf": true, "tr": [["26.09.05", 5, 368000000], ["26.07.07", 7, 343000000], ["26.02.25", 12, 340000000], ["25.11.29", 11, 345000000], ["25.10.11", 19, 360000000], ["25.09.27", 18, 330000000], ["25.08.30", 15, 330000000], ["25.07.26", 20, 320000000], ["25.06.05", 7, 325000000], ["24.12.19", 16, 360000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.09.05", 5, 368000000], "simN": 3, "y1": {"n": 4, "avg": 349000000, "lo": 340000000, "hi": 368000000}, "basis": "1년 평균", "cand": true}, {"court": "부산", "case": "2025타경21701", "name": "흥아거북", "gu": "연제구", "dong": "연산동", "ho": "5층 509호", "m2": 84.5, "fl": 5, "date": "2026-11-03", "appr": 110000000, "min": 53900000, "fail": 2, "flag": "지분", "addr": "부산 연제구 연산동 1122-3", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경21725", "name": "아이뷰파크", "gu": "동래구", "dong": "명장동", "ho": "5층 503호", "m2": 35.0, "fl": 5, "date": "2026-11-11", "appr": 177000000, "min": 86730000, "fail": 2, "flag": "", "addr": "부산 동래구 명장동 136-9", "mkt": 149250000, "mktN": 2, "conf": false, "tr": [["26.08.11", 9, 138500000], ["26.07.07", 5, 160000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.08.11", 9, 138500000], "sim": ["26.07.07", 5, 160000000], "simN": 1, "y1": {"n": 2, "avg": 149250000, "lo": 138500000, "hi": 160000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경21727", "name": "아이뷰파크", "gu": "동래구", "dong": "명장동", "ho": "7층 701호", "m2": 52.9, "fl": 7, "date": "2026-11-03", "appr": 267000000, "min": 186900000, "fail": 1, "flag": "", "addr": "부산 동래구 명장동 136-9", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경21759", "name": "연지자이2차아파트", "gu": "부산진구", "dong": "연지동", "ho": "201동 6층 602호", "m2": 59.7, "fl": 6, "date": "2026-11-03", "appr": 360000000, "min": 252000000, "fail": 1, "flag": "", "addr": "부산 부산진구 연지동 406", "mkt": 391666666, "mktN": 28, "conf": true, "tr": [["26.10.28", 13, 388000000], ["26.10.13", 22, 390000000], ["26.08.20", 11, 390000000], ["26.08.08", 5, 387000000], ["26.08.05", 3, 388000000], ["26.07.21", 12, 425000000], ["26.05.27", 15, 400000000], ["26.05.26", 18, 410000000], ["26.05.23", 11, 405000000], ["26.05.01", 11, 390000000], ["26.03.14", 11, 420000000], ["26.03.08", 20, 350000000], ["26.02.14", 19, 392000000], ["26.01.24", 2, 360000000], ["26.01.21", 5, 390000000], ["26.01.10", 18, 395000000], ["25.11.20", 21, 390000000], ["25.11.01", 4, 380000000], ["25.09.24", 8, 360000000], ["25.09.03", 3, 357000000], ["25.07.29", 3, 377500000], ["25.07.04", 16, 358000000], ["25.06.07", 17, 383000000], ["25.03.29", 6, 370000000], ["25.02.27", 5, 376000000], ["25.02.27", 5, 376000000], ["25.01.13", 22, 390000000], ["24.11.26", 14, 370000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.10.28", 13, 388000000], "sim": ["26.08.08", 5, 387000000], "simN": 4, "y1": {"n": 18, "avg": 391666666, "lo": 350000000, "hi": 425000000}, "basis": "1년 평균", "cand": true}, {"court": "부산", "case": "2025타경21766", "name": "절영아파트", "gu": "영도구", "dong": "동삼동", "ho": "215동 1층 102호", "m2": 46.3, "fl": 1, "date": "2026-11-03", "appr": 101000000, "min": 70700000, "fail": 1, "flag": "", "addr": "부산 영도구 동삼동 510-11", "mkt": 109150000, "mktN": 21, "conf": true, "tr": [["26.09.21", 13, 113000000], ["26.09.03", 4, 77000000], ["26.08.26", 6, 101500000], ["26.05.10", 15, 119000000], ["26.01.28", 14, 105000000], ["26.01.10", 18, 126000000], ["26.01.09", 16, 106000000], ["25.12.08", 8, 126000000], ["25.12.03", 15, 111000000], ["25.11.18", 11, 107000000], ["25.10.27", 13, 105000000], ["25.10.18", 4, 103000000], ["25.10.02", 19, 125000000], ["25.09.25", 1, 84500000], ["25.08.24", 18, 128000000], ["25.06.06", 7, 121000000], ["25.04.12", 8, 110000000], ["25.03.13", 7, 110000000], ["25.03.08", 4, 105000000], ["25.01.25", 10, 107000000], ["25.01.22", 17, 119000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.09.21", 13, 113000000], "sim": ["26.09.03", 4, 77000000], "simN": 1, "y1": {"n": 10, "avg": 109150000, "lo": 77000000, "hi": 126000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경21775", "name": "대동레미안센트럴시티5", "gu": "부산진구", "dong": "범천동", "ho": "18층 1802호", "m2": 44.2, "fl": 18, "date": "2026-11-03", "appr": 219000000, "min": 153300000, "fail": 1, "flag": "", "addr": "부산 부산진구 범천동 849-2", "mkt": 245000000, "mktN": 1, "conf": false, "tr": [["25.05.08", 9, 245000000]], "rec": false, "pred": null, "mixed": false, "last": ["25.05.08", 9, 245000000], "simN": 0, "basis": "최근 거래", "cand": false}, {"court": "부산", "case": "2025타경21788", "name": "태광아파트", "gu": "연제구", "dong": "연산동", "ho": "3층 309호", "m2": 65.0, "fl": 3, "date": "2026-11-03", "appr": 155000000, "min": 108500000, "fail": 1, "flag": "", "addr": "부산 연제구 연산동 405-4", "mkt": 84000000, "mktN": 2, "conf": false, "tr": [["25.04.02", 4, 84000000], ["25.03.01", 2, 150000000]], "rec": false, "pred": null, "mixed": false, "last": ["25.04.02", 4, 84000000], "simN": 0, "basis": "최근 거래", "cand": false}, {"court": "부산", "case": "2025타경21807", "name": "전포화신거화아파트", "gu": "부산진구", "dong": "전포동", "ho": "3층 302호", "m2": 84.7, "fl": 3, "date": "2026-11-03", "appr": 184000000, "min": 128800000, "fail": 1, "flag": "", "addr": "부산 부산진구 전포동 191-3", "mkt": 168500000, "mktN": 3, "conf": false, "tr": [["26.05.05", 11, 170000000], ["25.12.08", 8, 167000000], ["24.12.03", 4, 182000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.05.05", 11, 170000000], "sim": ["24.12.03", 4, 182000000], "simN": 0, "y1": {"n": 2, "avg": 168500000, "lo": 167000000, "hi": 170000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경21817", "name": "시민공원일동미라주시티", "gu": "부산진구", "dong": "부암동", "ho": "5층 501호", "m2": 41.5, "fl": 5, "date": "2026-11-03", "appr": 225000000, "min": 157500000, "fail": 1, "flag": "", "addr": "부산 부산진구 부암동 304-14", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경21830", "name": "아름베스트빌1차", "gu": "금정구", "dong": "구서동", "ho": "15층 1502호", "m2": 49.2, "fl": 15, "date": "2026-11-03", "appr": 121000000, "min": 84700000, "fail": 1, "flag": "", "addr": "부산 금정구 구서동 466-3", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경21863", "name": "새한센시빌", "gu": "동래구", "dong": "수안동", "ho": "101동 2층 202호", "m2": 84.8, "fl": 2, "date": "2026-11-03", "appr": 266000000, "min": 186200000, "fail": 1, "flag": "", "addr": "부산 동래구 수안동 11-24", "mkt": null, "mktN": 0, "conf": false, "tr": [], "rec": false, "pred": null, "mixed": false, "cand": false}, {"court": "부산", "case": "2025타경21868", "name": "세진베스트빌", "gu": "동래구", "dong": "온천동", "ho": "3층 303호", "m2": 78.9, "fl": 3, "date": "2026-11-11", "appr": 268000000, "min": 187600000, "fail": 1, "flag": "", "addr": "부산 동래구 온천동 192-28", "mkt": 207500000, "mktN": 1, "conf": false, "tr": [["25.03.04", 6, 207500000]], "rec": false, "pred": null, "mixed": false, "last": ["25.03.04", 6, 207500000], "simN": 0, "basis": "최근 거래", "cand": false}, {"court": "부산", "case": "2025타경21877", "name": "동래동일스위트", "gu": "동래구", "dong": "명장동", "ho": "101동 11층 1104호", "m2": 84.9, "fl": 11, "date": "2026-11-03", "appr": 445000000, "min": 311500000, "fail": 1, "flag": "", "addr": "부산 동래구 명장동 617", "mkt": 456666666, "mktN": 9, "conf": true, "tr": [["26.08.19", 16, 460000000], ["26.01.29", 14, 455000000], ["25.12.02", 19, 455000000], ["25.08.21", 24, 448000000], ["25.08.14", 15, 410000000], ["25.07.26", 16, 448000000], ["25.07.03", 14, 460000000], ["25.04.15", 10, 450000000], ["25.04.08", 23, 449000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.08.19", 16, 460000000], "sim": ["26.01.29", 14, 455000000], "simN": 1, "y1": {"n": 3, "avg": 456666666, "lo": 455000000, "hi": 460000000}, "basis": "1년 평균", "cand": true}, {"court": "부산", "case": "2025타경21885", "name": "온천동반도보라스카이뷰", "gu": "동래구", "dong": "온천동", "ho": "107동 15층 1501호", "m2": 85.0, "fl": 15, "date": "2026-11-03", "appr": 486000000, "min": 486000000, "fail": 0, "flag": "", "addr": "부산 동래구 온천동 1412-1", "mkt": 553210526, "mktN": 50, "conf": true, "tr": [["26.08.30", 10, 556000000], ["26.08.28", 8, 568000000], ["26.08.12", 5, 569000000], ["26.08.10", 23, 550000000], ["26.07.26", 17, 590000000], ["26.07.17", 3, 600000000], ["26.05.25", 6, 570000000], ["26.05.18", 35, 530000000], ["26.04.07", 4, 540000000], ["26.03.24", 29, 570000000], ["26.03.23", 2, 500000000], ["26.03.07", 7, 530000000], ["26.01.21", 33, 540000000], ["26.01.16", 2, 490000000], ["26.01.10", 29, 600000000], ["25.12.13", 31, 548000000], ["25.12.02", 22, 560000000], ["25.11.13", 3, 580000000], ["25.11.03", 7, 520000000], ["25.10.27", 16, 540000000], ["25.10.26", 25, 548000000], ["25.10.18", 26, 530000000], ["25.09.13", 9, 525000000], ["25.08.27", 21, 530000000], ["25.08.23", 3, 495000000], ["25.07.24", 10, 480000000], ["25.07.08", 30, 545000000], ["25.07.04", 33, 510000000], ["25.07.02", 27, 495000000], ["25.06.26", 16, 505000000], ["25.06.11", 34, 500000000], ["25.05.16", 21, 488000000], ["25.05.01", 16, 505000000], ["25.04.23", 24, 488000000], ["25.04.11", 6, 460000000], ["25.03.29", 5, 478000000], ["25.03.22", 7, 477000000], ["25.03.22", 17, 485000000], ["25.03.04", 5, 450000000], ["25.02.25", 11, 500000000], ["25.02.05", 12, 477000000], ["25.01.22", 20, 480000000], ["25.01.18", 6, 455000000], ["25.01.15", 19, 473000000], ["25.01.11", 9, 479000000], ["24.12.20", 2, 475000000], ["24.12.06", 26, 485000000], ["24.11.25", 27, 500000000], ["24.11.24", 10, 470000000], ["24.11.22", 2, 476500000]], "rec": false, "pred": null, "mixed": false, "last": ["26.08.30", 10, 556000000], "sim": ["26.07.26", 17, 590000000], "simN": 1, "y1": {"n": 19, "avg": 553210526, "lo": 490000000, "hi": 600000000}, "basis": "1년 평균", "cand": false}, {"court": "부산", "case": "2025타경21891", "name": "서면노르웨이아침", "gu": "부산진구", "dong": "전포동", "ho": "20층 2021호", "m2": 30.5, "fl": 20, "date": "2026-11-09", "appr": 93000000, "min": 93000000, "fail": 0, "flag": "", "addr": "부산 부산진구 전포동 892-21", "mkt": 54900000, "mktN": 10, "conf": true, "tr": [["26.10.29", 17, 50000000], ["26.08.21", 8, 50000000], ["26.08.19", 5, 51000000], ["26.07.06", 10, 61500000], ["26.04.24", 14, 62000000], ["25.07.15", 10, 56000000], ["25.06.14", 10, 55000000], ["25.06.13", 8, 60000000], ["25.03.28", 4, 52000000], ["24.12.08", 7, 60000000]], "rec": false, "pred": null, "mixed": false, "last": ["26.10.29", 17, 50000000], "simN": 1, "y1": {"n": 5, "avg": 54900000, "lo": 50000000, "hi": 62000000}, "basis": "1년 평균", "cand": false}, {"court": "부산서부", "case": "2025타경102229", "name": "반도보라타운", "gu": "사상구", "dong": "", "ho": "", "m2": 84, "fl": 2, "date": "2026-11-03", "appr": null, "min": 119000000, "fail": null, "flag": "", "addr": "부산 사상구 반도보라타운", "mkt": 180000000, "mktN": 0, "conf": true, "tr": [], "basis": "1년 중간값", "rec": true, "pred": 145000000, "rights": true, "cand": false}, {"court": "부산동부", "case": "2024타경2963", "name": "수영강동원로얄듀크", "gu": "수영구", "dong": "", "ho": "", "m2": 84, "fl": 8, "date": "2026-11-03", "appr": null, "min": 357700000, "fail": 1, "flag": "", "addr": "부산 수영구 강동원로얄듀크", "mkt": 566000000, "mktN": 0, "conf": true, "tr": [], "basis": "6개월 실거래", "rec": false, "pred": null, "cand": true}, {"court": "부산동부", "case": "2025타경5813", "name": "경남선경", "gu": "해운대구", "dong": "좌동", "ho": "", "m2": 59, "fl": 8, "date": "2026-11-03", "appr": null, "min": 189700000, "fail": null, "flag": "", "addr": "부산 해운대구 좌동 경남선경", "mkt": 274000000, "mktN": 0, "conf": true, "tr": [], "basis": "6개월 실거래", "rec": false, "pred": null, "cand": false}, {"court": "부산서부", "case": "2025타경101933", "name": "명지두산위브포세이돈", "gu": "강서구", "dong": "명지동", "ho": "", "m2": 84, "fl": 12, "date": "2026-11-04", "appr": null, "min": 279000000, "fail": null, "flag": "", "addr": "부산 강서구 명지두산위브포세이돈", "mkt": 328000000, "mktN": 49, "conf": true, "tr": [], "basis": "1년 실거래", "rec": true, "pred": null, "rights": true, "dateCheck": true, "cand": false}];
+const PRICES=[["금액 전체",0,Infinity],["1억↓",0,1e8],["1~2억",1e8,2e8],["2~4억",2e8,4e8],["4억↑",4e8,Infinity]];
+const SIZES=[["평형 전체",0,999],["~12평",0,40],["12~20평",40,65],["25평대",65,100],["30평↑",100,999]];
+const FAILS=[["유찰 전체",-1],["신건",0],["1회+",1],["2회+",2]];
+const PICKS=[["전체"],["후보+추천"],["⭐ 추천"]];
+const WK="일월화수목금토";
+const st={q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date"};
+const $=id=>document.getElementById(id);
+const eok=v=>{if(v==null)return"—";if(v<1e8)return Math.round(v/1e4).toLocaleString()+"만";const e=v/1e8;return (e>=10?e.toFixed(1):e.toFixed(2)).replace(/\.?0+$/,"")+"억"};
+const won=v=>{if(v==null)return"—";const e=Math.floor(v/1e8),m=Math.round(v%1e8/1e4);return (e?e+"억 ":"")+(m?m.toLocaleString()+"만":"")||"0"};
+const days=d=>Math.round((new Date(d+"T00:00:00")-TODAY)/864e5);
+const dlabel=d=>{const n=days(d);return n===0?"D-day":"D-"+n};
+const md=d=>{const t=new Date(d+"T00:00:00");return (t.getMonth()+1)+"."+t.getDate()+" ("+WK[t.getDay()]+")"};
+const disc=x=>x.mkt?Math.round((1-x.min/x.mkt)*100):null;
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const kakao=x=>"https://map.kakao.com/link/search/"+encodeURIComponent(x.addr);
+
+/* hero */
+$("hTotal").textContent=DATA.length;
+const ds=DATA.map(disc).filter(v=>v!=null&&v>0);
+const soon=DATA.filter(x=>days(x.date)<=7).length;
+$("stats").innerHTML=[["진행 물건",DATA.length,"건"],["7일 안에 마감",soon,"건"],["시세 대비 평균",Math.round(ds.reduce((a,b)=>a+b,0)/ds.length),"% 싸게"],["후보 · 추천",DATA.filter(x=>x.cand).length+" · "+DATA.filter(x=>x.rec).length,"건"]]
+  .map(([k,v,u])=>`<div class="stat"><small>${k}</small><b>${v}<em>${u}</em></b></div>`).join("");
+const dayList=[...new Set(DATA.map(x=>x.date))].sort();
+function drawDays(){$("days").innerHTML=[`<button class="day" data-d="" aria-pressed="${!st.day}"><small>매각기일</small><span>전체</span></button>`]
+  .concat(dayList.map(d=>`<button class="day" data-d="${d}" aria-pressed="${st.day===d}"><small>${md(d)}</small><span>${DATA.filter(x=>x.date===d).length}건</span></button>`)).join("");
+  $("days").querySelectorAll(".day").forEach(b=>b.onclick=()=>{st.day=b.dataset.d;drawDays();render()})}
+drawDays();
+
+/* picks */
+$("picks").innerHTML=DATA.filter(x=>x.rec).sort((a,b)=>a.date.localeCompare(b.date)).map(x=>`<article class="pick">
+  <div class="row1"><span>${x.court} ${x.case}</span><span class="dd ${days(x.date)<=5?"soon":""}">${dlabel(x.date)} · ${md(x.date)}</span></div>
+  <div><h3>${esc(x.name)}</h3><div class="sub">${x.gu}${x.dong?" "+x.dong:""}${x.m2?" · "+Math.round(x.m2/3.3058)+"평":""} · 최저가 ${eok(x.min)} · 시세 ${eok(x.mkt)}</div></div>
+  <div class="pv"><div><small>예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">DM으로 문의</b>`}</div>
+  <span class="acts"><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">지도</a><button class="btn dark open" data-case="${x.case}">상세</button></span></div>
+</article>`).join("");
+$("picks").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
+
+/* filters */
+const guSel=$("gu");
+[...new Set(DATA.map(x=>x.gu))].sort().forEach(g=>guSel.add(new Option(g+" "+DATA.filter(x=>x.gu===g).length,g)));
+function seg(id,arr,key){const el=$(id);el.innerHTML=arr.map((a,i)=>`<button data-i="${i}" aria-pressed="${i===st[key]}">${a[0]}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{st[key]=+b.dataset.i;el.querySelectorAll("button").forEach(c=>c.setAttribute("aria-pressed",c===b));render()})}
+function segs(){seg("price",PRICES,"price");seg("size",SIZES,"size");seg("fail",FAILS,"fail");seg("pick",PICKS,"pick")}
+segs();
+guSel.onchange=e=>{st.gu=e.target.value;render()};
+$("sort").onchange=e=>{st.sort=e.target.value;render()};
+$("q").oninput=e=>{st.q=e.target.value.trim();render()};
+$("moreBtn").onclick=()=>{const a=$("adv");a.hidden=!a.hidden;$("moreBtn").setAttribute("aria-expanded",!a.hidden)};
+$("reset").onclick=()=>{Object.assign(st,{q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date"});$("q").value="";guSel.value="";$("sort").value="date";segs();drawDays();render()};
+
+function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,1900)}
+async function copyCase(c){try{await navigator.clipboard.writeText(c);toast("사건번호를 복사했어요 · 인스타 DM에 붙여넣기")}catch(e){toast(c+" · 이 번호를 DM으로 보내주세요")}}
+
+function diffTxt(ref){if(ref==null)return"";const g=ref-0;return g}
+function cmpRow(label,sub,val,min){
+  if(val==null)return"";const g=val-min;
+  const t=g>0?`<span class="cheap">${eok(g)} 싸게</span>`:g<0?`<span class="dear">${eok(-g)} 비싸게</span>`:`<span class="dim">같음</span>`;
+  return `<div class="cr"><div class="cl">${label}${sub?`<small>${sub}</small>`:""}</div><div class="cv">${won(val)}</div><div class="cd">${t}</div></div>`}
+function refs(x){
+  let h="";
+  if(x.last)h+=cmpRow("최근 실거래",`${x.last[0]} · ${x.last[1]}층`,x.last[2],x.min);
+  if(x.sim)h+=cmpRow("비슷한 층 최근",`${x.sim[0]} · ${x.sim[1]}층`,x.sim[2],x.min);
+  if(x.y1){h+=cmpRow("1년 평균",`${x.y1.n}건`,x.y1.avg,x.min);
+    h+=cmpRow("1년 최저",x.y1.n>1?`최고 ${eok(x.y1.hi)}`:"",x.y1.lo,x.min)}
+  if(!x.tr.length&&x.mkt)h+=cmpRow("실거래 시세",x.basis||"",x.mkt,x.min);
+  if(x.appr)h+=cmpRow("감정가",x.appr?`최저가는 ${Math.round(x.min/x.appr*100)}%`:"",x.appr,x.min);
+  if(!x.last&&!x.mkt)h+=`<div class="cr none">${x.mixed?"평형 정보가 없어 단지 전체 거래만 있어요 · 상세에서 확인":"최근 2년 같은 평형 거래가 없어요"}</div>`;
+  return `<div class="cmp">${h}</div>`}
+function chart(x){
+  const t=x.tr.filter(r=>!x.mixed);if(t.length<2)return"";
+  const W=320,H=150,P={l:40,r:10,t:12,b:22};
+  const toT=d=>{const [y,m,dd]=d.split(".").map(Number);return y*12+m-1+dd/31};
+  const xs=t.map(r=>toT(r[0])),x0=toT("24.11.01"),x1=toT("26.11.01");
+  const vals=t.map(r=>r[2]).concat([x.min]).concat(x.appr?[x.appr]:[]);
+  let lo=Math.min(...vals),hi=Math.max(...vals);const pad=(hi-lo)*.12||hi*.1;lo-=pad;hi+=pad;
+  const X=v=>P.l+(v-x0)/(x1-x0)*(W-P.l-P.r),Y=v=>P.t+(hi-v)/(hi-lo)*(H-P.t-P.b);
+  const tk=[];const step=(hi-lo)/3;for(let i=0;i<=3;i++)tk.push(lo+step*i);
+  const grid=tk.map(v=>`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${P.l-6}" y="${Y(v)+3}" text-anchor="end" font-size="9" fill="var(--faint)">${eok(v)}</text>`).join("");
+  const yr=["25.01.01","26.01.01"].map(d=>`<line x1="${X(toT(d))}" x2="${X(toT(d))}" y1="${P.t}" y2="${H-P.b}" stroke="var(--line)" stroke-dasharray="2 3"/><text x="${X(toT(d))}" y="${H-6}" text-anchor="middle" font-size="9" fill="var(--faint)">20${d.slice(0,2)}</text>`).join("");
+  const dots=t.map((r,i)=>`<circle cx="${X(xs[i]).toFixed(1)}" cy="${Y(r[2]).toFixed(1)}" r="3" fill="var(--ink)" fill-opacity=".55"><title>${r[0]} ${r[1]}층 ${won(r[2])}</title></circle>`).join("");
+  const line=(v,c,lab,dash)=>`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${c}" stroke-width="1.6" ${dash?'stroke-dasharray="4 3"':""}/><text x="${W-P.r}" y="${Y(v)-4}" text-anchor="end" font-size="9.5" font-weight="700" fill="${c}">${lab} ${eok(v)}</text>`;
+  return `<div class="chart"><div class="ch">실거래 2년 · 점 1개 = 거래 1건</div><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="실거래 추이">${grid}${yr}${x.appr?line(x.appr,"var(--faint)","감정가",true):""}${line(x.min,"var(--good)","최저가",false)}${dots}</svg></div>`}
+function drawer(x){
+  const nxt=x.fail!=null?Math.round(x.min*0.8/1e5)*1e5:null;
+  const rows=x.tr.map(t=>`<tr><td>20${t[0]}</td><td>${t[1]}층</td>${x.mixed?`<td>${t[3]}㎡</td>`:""}<td><b>${won(t[2])}</b></td><td class="${t[2]>x.min?"cheap":"dear"}">${t[2]>x.min?eok(t[2]-x.min)+" ↓":eok(x.min-t[2])+" ↑"}</td></tr>`).join("");
+  return `<div class="drawer">
+   ${chart(x)}
+   <dl class="kv">
+    ${x.appr?`<dt>감정가</dt><dd>${won(x.appr)}</dd>`:""}
+    <dt>이번 최저가</dt><dd>${won(x.min)}${x.appr?` · 감정가의 ${Math.round(x.min/x.appr*100)}%`:""}</dd>
+    ${nxt?`<dt>유찰되면</dt><dd>다음 최저가 약 ${won(nxt)}</dd>`:""}
+    ${x.y1?`<dt>1년 범위</dt><dd>${won(x.y1.lo)} ~ ${won(x.y1.hi)} · ${x.y1.n}건</dd>`:""}
+    ${x.simN!=null?`<dt>비슷한 층</dt><dd>±3층 1년 거래 ${x.simN}건</dd>`:""}
+    ${x.flag?`<dt>특이사항</dt><dd style="color:var(--warn);font-weight:700">${esc(x.flag)} · 매각물건명세서 확인</dd>`:""}
+   </dl>
+   ${rows?`<div class="tw tall"><table><thead><tr><th>계약일</th><th>층</th>${x.mixed?"<th>전용</th>":""}<th>금액</th><th>최저가가 싼 금액</th></tr></thead><tbody>${rows}</tbody></table></div>`:""}
+   <div class="links"><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">카카오맵</a><a class="btn" href="https://m.land.naver.com/search/result/${encodeURIComponent(x.gu+" "+x.name)}" target="_blank" rel="noopener">네이버부동산</a><a class="btn court" href="${COURT_URL}" target="_blank" rel="noopener">법원경매정보 (사건번호 복사)</a></div>
+  </div>`}
+
+function ref(x){
+  if(x.last)return {label:"최근 실거래",v:x.last[2],sub:`20${x.last[0].slice(0,5).replace(".","년 ")}월 · ${x.last[1]}층`,k:"최근 거래가"};
+  if(x.mkt)return {label:"실거래 시세",v:x.mkt,sub:x.basis||"",k:"실거래 시세"};
+  if(x.appr)return {label:"감정가",v:x.appr,sub:"법원 감정",k:"감정가"};
+  return null}
+function saveLine(x){
+  const r=ref(x);if(!r)return `<div class="save none">비교할 실거래가 아직 없어요</div>`;
+  const g=r.v-x.min,p=Math.round(g/r.v*100);
+  if(g<=0)return `<div class="save none">${r.k}와 비슷하거나 높아요</div>`;
+  return `<div class="save${p>=20?" hot":""}">${r.k}보다 <b>${won(g)}원</b> 싸요<span>${p}%↓</span></div>`}
+function card(x){
+  const d=disc(x), n=days(x.date);
+  return `<article class="card${x.rec?" rec":""}">
+   <div class="c-top"><span class="case">${x.court} ${x.case}</span><span class="dd ${n<=5?"soon":""}">${dlabel(x.date)} · ${md(x.date)}${x.dateCheck?" 확인중":""}</span></div>
+   <div class="c-name"><h3 title="${esc(x.name)}">${esc(x.name)}</h3><span class="ho${x.ho?"":" none"}">${x.ho?esc(x.ho):"동·호 확인 중"}</span>
+     <span class="c-loc">${x.gu}${x.dong?" "+x.dong:""}${x.m2?` · ${Math.round(x.m2/3.3058)}평`:""}${x.fail!=null?" · "+(x.fail?"유찰 "+x.fail+"회":"신건"):""}</span></div>
+   ${saveLine(x)}
+   <div class="pair">
+     <div><div class="lbl">이번 최저가</div><div class="big">${won(x.min)}</div></div>
+     <div class="vs">${ref(x)?`<div class="lbl">${ref(x).label}</div><div class="mid">${won(ref(x).v)}</div><div class="when">${ref(x).sub}</div>`:`<div class="lbl">비교할 거래</div><div class="mid none">없음</div>`}</div>
+   </div>   <div class="tags">${x.rec?'<span class="tag rec">⭐ 추천</span>':""}${x.cand?'<span class="tag cand">후보</span>':""}${x.rights?'<span class="tag ok">✓ 권리 확인</span>':""}${x.flag?`<span class="tag warn">${esc(x.flag)}</span>`:""}${!x.rights&&!x.rcheck?'<span class="tag">인수조건 확인 전</span>':""}${x.mktN?`<span class="tag">2년 거래 ${x.mktN}건</span>`:""}</div>
+   <div class="c-foot">
+     <div class="pred"><small>예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">DM으로 문의</b>`}</div>
+     <div class="acts"><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">지도</a><button class="btn dark open" data-case="${x.case}">상세</button></div>
+   </div>
+  </article>`}
+const COURT_URL="https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml";
+function openSheet(x){
+  const d=disc(x);
+  $("sheetBody").innerHTML=`
+   <div class="s-head"><div><div class="case">${x.court} ${x.case} · ${dlabel(x.date)} ${md(x.date)}</div><h2>${esc(x.name)}</h2><div class="c-loc">${x.ho?esc(x.ho)+" · ":""}${x.gu}${x.dong?" "+x.dong:""}${x.m2?` · 전용 ${x.m2}㎡ (${Math.round(x.m2/3.3058)}평)`:""}${x.fail!=null?" · "+(x.fail?"유찰 "+x.fail+"회":"신건"):""}</div></div>
+   <button class="x" id="sheetClose" aria-label="닫기">✕</button></div>
+   <div class="price s-price"><div><div class="lbl">이번 최저가</div><div class="big">${won(x.min)}</div></div><div class="disc ${d>=20?"hot":""}">${d==null?"—":d+"%"}<small>${d==null?"":(x.basis||"시세")+" 대비"}</small></div></div>
+   <div class="mapbox"><div class="mtabs" role="tablist"><button class="mt" data-v="map" aria-pressed="true">지도</button><button class="mt" data-v="rv" aria-pressed="false">로드뷰</button><a class="mt ext" href="${kakao(x)}" target="_blank" rel="noopener">카카오맵 열기 ↗</a></div>
+     <div class="mapview" id="mapView"><div class="mapmsg">지도 불러오는 중…</div></div><div class="mapview" id="rvView" hidden></div></div>
+   <h4>가격 비교</h4>${refs(x)}
+   ${drawer(x)}
+   <div class="pv-box"><div class="pred"><small>bid.archive 예상낙찰가</small>${x.pred?`<b class="hl">${eok(x.pred)}</b>`:`<b class="ask">사건번호를 인스타 DM(@bid.archive)으로 보내주세요</b>`}</div>
+   <button class="btn dark cp" data-case="${x.case}">사건번호 복사</button></div>`;
+  $("sheet").hidden=false;document.body.style.overflow="hidden";
+  $("sheetClose").onclick=closeSheet;$("sheetClose").focus();
+  $("sheetBody").querySelectorAll(".cp").forEach(b=>b.onclick=()=>copyCase(b.dataset.case));
+  $("sheetBody").querySelectorAll(".court").forEach(b=>b.onclick=()=>{copyCase(x.case);});
+  $("sheetBody").querySelectorAll(".mt[data-v]").forEach(b=>b.onclick=()=>{$("sheetBody").querySelectorAll(".mt[data-v]").forEach(c=>c.setAttribute("aria-pressed",c===b));$("mapView").hidden=b.dataset.v!=="map";$("rvView").hidden=b.dataset.v!=="rv";if(b.dataset.v==="rv")showRoadview();else if(MAP.map)MAP.map.relayout()});
+  showMap(x);
+}
+const KAKAO_KEY="e6e72570d5cf875f65a1e5e3c51b3eaa";
+const MAP={loading:null,pos:null,map:null};
+function loadKakao(){
+  if(MAP.loading)return MAP.loading;
+  MAP.loading=new Promise((ok,no)=>{
+    if(window.kakao&&kakao.maps){kakao.maps.load(ok);return}
+    const sc=document.createElement("script");
+    sc.src="https://dapi.kakao.com/v2/maps/sdk.js?appkey="+KAKAO_KEY+"&autoload=false&libraries=services";
+    sc.onload=()=>kakao.maps.load(ok);sc.onerror=no;document.head.appendChild(sc);
+    setTimeout(()=>no(new Error("timeout")),6000)});
+  MAP.loading.catch(()=>{MAP.loading=null});
+  return MAP.loading}
+function mapFail(x){$("mapView").innerHTML=`<div class="mapmsg">이 화면에서는 지도를 불러올 수 없어요.<br><a class="btn k" href="${kakao(x)}" target="_blank" rel="noopener">카카오맵에서 보기</a></div>`}
+function locate(x){return new Promise(res=>{
+  const g=new kakao.maps.services.Geocoder();
+  g.addressSearch(x.addr,(r,st)=>{
+    if(st===kakao.maps.services.Status.OK&&r[0])return res(new kakao.maps.LatLng(r[0].y,r[0].x));
+    new kakao.maps.services.Places().keywordSearch(x.addr,(p,s2)=>res(s2===kakao.maps.services.Status.OK&&p[0]?new kakao.maps.LatLng(p[0].y,p[0].x):null))})})}
+async function showMap(x){
+  MAP.map=null;MAP.pos=null;
+  try{await loadKakao()}catch(e){mapFail(x);return}
+  const pos=await locate(x);
+  if($("sheet").hidden)return;
+  if(!pos){mapFail(x);return}
+  MAP.pos=pos;const el=$("mapView");el.innerHTML="";
+  const m=new kakao.maps.Map(el,{center:pos,level:3});MAP.map=m;
+  m.addControl(new kakao.maps.ZoomControl(),kakao.maps.ControlPosition.RIGHT);
+  new kakao.maps.Marker({position:pos,map:m});
+  new kakao.maps.CustomOverlay({position:pos,yAnchor:2.6,content:`<div class="pin">${esc(x.name)}</div>`,map:m});
+}
+function showRoadview(){
+  const el=$("rvView");if(!MAP.pos){el.innerHTML='<div class="mapmsg">지도 위치를 먼저 불러오는 중이에요.</div>';return}
+  el.innerHTML="";const rv=new kakao.maps.Roadview(el);
+  new kakao.maps.RoadviewClient().getNearestPanoId(MAP.pos,80,id=>{if(id===null){el.innerHTML='<div class="mapmsg">이 위치 근처에는 로드뷰가 없어요.</div>';return}rv.setPanoId(id,MAP.pos)})}
+function closeSheet(){$("sheet").hidden=true;document.body.style.overflow=""}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)closeSheet()});
+
+function render(){
+  const [,p0,p1]=PRICES[st.price],[,s0,s1]=SIZES[st.size],f0=FAILS[st.fail][1],q=st.q.toLowerCase();
+  let r=DATA.filter(x=>(!st.gu||x.gu===st.gu)&&(!st.day||x.date===st.day)&&x.min>=p0&&x.min<p1
+    &&(st.size===0||(x.m2&&x.m2>=s0&&x.m2<s1))&&(f0<0||(f0===0?x.fail===0:(x.fail||0)>=f0))
+    &&(st.pick===0||(st.pick===1?(x.cand||x.rec):x.rec))
+    &&(!q||(x.name+x.dong+x.gu+x.case+x.ho).toLowerCase().includes(q)));
+  r.sort(st.sort==="date"?(a,b)=>a.date.localeCompare(b.date)||(b.rec-a.rec)||(b.cand-a.cand)||((disc(b)??-99)-(disc(a)??-99))
+    :st.sort==="disc"?(a,b)=>(disc(b)??-99)-(disc(a)??-99):(a,b)=>a.min-b.min);
+  $("count").innerHTML=`<b>${r.length}</b>건 표시 · 전체 ${DATA.length}건`;
+  const L=$("list");
+  if(!r.length){L.innerHTML='<div class="empty">조건에 맞는 물건이 없어요. 조건을 넓히거나 초기화해 보세요.</div>';return}
+  L.innerHTML=r.map(card).join("");
+  L.querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
+}
+render();
+</script>
+
+</body>
+</html>
