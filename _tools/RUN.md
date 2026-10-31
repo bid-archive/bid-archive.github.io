@@ -1,7 +1,7 @@
 # bid.archive 매일 수집 런북 (예약 작업용)
 
 전제: 대성님 PC 켜짐 + 크롬(Claude in Chrome) 연결 + 옥션원 로그인 상태. 비밀번호 입력 금지(로그아웃이면 중단·알림).
-규칙: 옥션원 요청 간 10초 이상. 옥션원 화면·문구·사진은 공개 페이지에 옮기지 않음(우리 판정만). 회사 관련(채권자 '우리') 건은 공개하지 않고 보고만.
+규칙: 옥션원 요청 간 10초 이상. 옥션원 화면·문구·사진은 공개 페이지에 옮기지 않음(우리 판정만).
 국토부 키: claude.ai 프로젝트 문서 `auction-insta/_molit_key.txt` (출력·노출 금지).
 
 ## 0. 환경 복원 (컨테이너)
@@ -26,4 +26,4 @@ setup.sh 다시 실행(새 src 받기) → `cd /home/claude/busan && for r in bu
 → GitHub upload/main/<region> 에 `/home/claude/busan/ghsite/<region>/index.html` 업로드·커밋(파일 입력에 file_upload) → 1~2분 뒤 bid-archive.github.io/<region>/ 반영 확인
 
 ## 3. 보고 (SendUserMessage, 개조식)
-지역별: 전체 / 신규 / 빠진 물건 / 판정 집계 / 🔥 추천 변동(gen.py 출력) / 인수 위험 신건 / 회사 관련 / 실패·미확인
+지역별: 전체 / 신규 / 빠진 물건 / 판정 집계 / 🔥 추천 변동(gen.py 출력) / 인수 위험 신건 / 실패·미확인
