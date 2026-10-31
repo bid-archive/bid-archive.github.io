@@ -1,0 +1,2 @@
+// GitHub 업로드 페이지(upload/main/<폴더>)에서 실행: 옥션원 탭이 postMessage로 보낸 파일을 파일 입력에 넣음 → 그 뒤 Commit changes 클릭
+window.addEventListener('message',e=>{if(e.origin!=='https://www.auction1.co.kr'||!e.data||!e.data.files)return;const inp=document.querySelector('input[type=file]');const dt=new DataTransfer();for(const f of e.data.files)dt.items.add(new File([f.text],f.name,{type:'text/plain'}));inp.files=dt.files;inp.dispatchEvent(new Event('change',{bubbles:true}));window.GOTF=e.data.files.map(f=>f.name+':'+f.text.length).join(',')});'listener ok'
