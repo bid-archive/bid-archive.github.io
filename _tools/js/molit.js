@@ -10,7 +10,7 @@ for(const sg of sgs){for(const ym of months)for(const [svc,typ] of [['RTMSDataSv
 const ymd=o=>String(o.dealYear).slice(2)+String(o.dealMonth).padStart(2,'0')+String(o.dealDay).padStart(2,'0');const T=[],R=[],BY={};
 for(const c of L){const b={t:[],r:[]};for(const sg of (c.sgs||[c.sg])){for(const k of [sg+'|'+norm(c.dong)+'|'+c.lot,sg+'|'+norm(String(c.dong).split(/\s+/).pop())+'|'+c.lot]){const x=IDX[k];if(x){b.t.push(...x.t);b.r.push(...x.r);break}}}if(!b.t.length&&!b.r.length)continue;
  const ok=o=>!c.m2||Math.abs(parseFloat(o.excluUseAr)-c.m2)<=2;const by=(b.t[0]||b.r[0]||{}).buildYear;if(by)BY[c.sg+':'+c.dong+'|'+c.lot]=by;
- T.push(c.pid+'#'+b.t.filter(ok).sort((a,z)=>ymd(z).localeCompare(ymd(a))).slice(0,80).map(o=>ymd(o)+','+(o.floor||0)+','+Math.round(parseInt(String(o.dealAmount).replace(/,/g,''))/10)).join(' '));
+ T.push(c.pid+'#'+b.t.filter(ok).sort((a,z)=>ymd(z).localeCompare(ymd(a))).slice(0,80).map(o=>ymd(o)+','+(o.floor||0)+','+Math.round(parseInt(String(o.dealAmount).replace(/,/g,''))/10)+(/직거래/.test(o.dealingGbn||'')?',D':'')).join(' '));
  const rr=b.r.filter(ok).sort((a,z)=>ymd(z).localeCompare(ymd(a)));const tp=o=>(o.contractType||'').includes('갱신')?'R':'N';const n=v=>String(v).replace(/,/g,'');
  R.push(c.pid+'#'+rr.filter(o=>!+n(o.monthlyRent)).slice(0,60).map(o=>ymd(o)+','+(o.floor||0)+','+n(o.deposit)+','+tp(o)).join(' ')+'#'+rr.filter(o=>+n(o.monthlyRent)).slice(0,60).map(o=>ymd(o)+','+(o.floor||0)+','+n(o.deposit)+','+n(o.monthlyRent)+','+tp(o)).join(' '))}
 window.MOUT={trades:T.join('\n'),rent:R.join('\n'),by:JSON.stringify(BY)};window.MDONE=true;try{window.opener.postMessage({MOUT:window.MOUT},'https://www.auction1.co.kr')}catch(e){}})();'molit started'
