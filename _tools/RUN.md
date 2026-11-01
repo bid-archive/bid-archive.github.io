@@ -7,7 +7,7 @@
 ## 0. 환경 복원 (컨테이너)
 curl -fsS https://raw.githubusercontent.com/bid-archive/bid-archive.github.io/main/_tools/setup.sh | bash
 
-## 1. 지역별 반복: busan → seoul → gyeonggi
+## 1. 지역별 반복: busan → seoul → gyeonggi → daejeon
 옥션원 탭(https://www.auction1.co.kr/auction/ca_list.php)에서 javascript_tool로:
 1) `_tools/js/a1_lib.js` 내용 실행 → `await A1.loadPrev('<region>')` → `A1.collect('<region>')` 실행(비동기, window.LOG로 진행 확인; 끝나면 LCASES 길이 반환)
    - 호출이 45초 넘으면 끊기므로 `A1.collect(r).then(n=>window.CN=n)`처럼 백그라운드로 걸고 폴링
@@ -18,11 +18,11 @@ curl -fsS https://raw.githubusercontent.com/bid-archive/bid-archive.github.io/ma
    - 신규 0건이면 생략(window.MOUT_NEW 비워둠)
 4) 업로드: 옥션원 탭 버튼 클릭 → `window.GHW=window.open('https://github.com/bid-archive/bid-archive.github.io/upload/main/<src폴더>','ghw')`
    - GitHub 탭에서 `gh_listener.js` 실행 → 옥션원 탭에서 `GHW.postMessage({files:A1.mkFiles()},'https://github.com')` → GitHub 탭 'Commit changes' 클릭
-   - src폴더: busan=_src, seoul=_src_seoul, gyeonggi=_src_gg
+   - src폴더: busan=_src, seoul=_src_seoul, gyeonggi=_src_gg, daejeon=_src_dj
 5) `A1.summary()`로 집계 기록
 
 ## 2. 빌드·게시 (컨테이너)
-setup.sh 다시 실행(새 src 받기) → `cd /home/claude/busan && for r in busan seoul gyeonggi; do python3 gen.py $r; python3 build.py $r; done`
+setup.sh 다시 실행(새 src 받기) → `cd /home/claude/busan && for r in busan seoul gyeonggi daejeon; do python3 gen.py $r; python3 build.py $r; done`
 → GitHub upload/main/<region> 에 `/home/claude/busan/ghsite/<region>/index.html` 업로드·커밋(파일 입력에 file_upload) → 1~2분 뒤 bid-archive.github.io/<region>/ 반영 확인
 
 ## 3. 보고 (SendUserMessage, 개조식)

@@ -7,7 +7,7 @@ T={}
 for l in open('src/trades.txt'):
     c,s=l.rstrip('\n').split('#')
     rows=[x.split(',') for x in s.split(' ') if x]
-    T[c]=[(d[:2]+'.'+d[2:4]+'.'+d[4:],int(f),int(a)*100000,int(r[0]) if (r:=z[3:]) else None) for z in rows for d,f,a in [z[:3]]]
+    T[c]=[(d[:2]+'.'+d[2:4]+'.'+d[4:],int(f),int(a)*100000,int(z[3]) if len(z)>3 and z[3].isdigit() else None,1 if 'D' in z[3:] else 0) for z in rows for d,f,a in [z[:3]]]
 R={}
 for l in open('src/rent.txt'):
     c,j,w=l.rstrip('\n').split('#')
@@ -17,11 +17,12 @@ for l in open('src/rent.txt'):
     R[c]=(J,W)
 def enrich(x):
     case=x['case']; fl=x.get('fl')
-    tr=T.get(case,[])
+    tra=T.get(case,[])
+    tr=[t for t in tra if not t[4]]
     if case in R: x['jr'],x['wr']=R[case]
     sizes={t[3] for t in tr if t[3]}
     mixed=bool(sizes) and max(sizes)-min(sizes)>3
-    x['tr']=[[t[0],t[1],t[2]]+([t[3]] if t[3] else []) for t in tr]; x['mixed']=mixed; x['mktN']=len(tr)
+    x['tr']=[[t[0],t[1],t[2],t[3]]+([1] if t[4] else []) if (t[3] or t[4]) else [t[0],t[1],t[2]] for t in tra]; x['mixed']=mixed; x['mktN']=len(tr); x['dirN']=len(tra)-len(tr)
     if tr and not mixed:
         y1=[t for t in tr if t[0]>=CUT]
         x['last']=[tr[0][0],tr[0][1],tr[0][2]]
