@@ -71,7 +71,7 @@ h1 .num{color:var(--lime)}
 /* filters */
 .fbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:24px}
 .fbar .in{padding-block:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.search{flex:1 1 220px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px;height:40px}
+.search{flex:1 1 140px;min-width:0;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px;height:40px}
 .search input{border:0;background:transparent;font:inherit;font-size:14px;color:var(--text);width:100%;outline:none}
 .search svg{flex:0 0 auto;color:var(--faint)}
 select{font:inherit;font-size:13px;height:40px;padding:0 30px 0 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);appearance:none;cursor:pointer;
@@ -416,6 +416,17 @@ h1{font-size:clamp(34px,11.8vw,56px)!important}
 .hp-r .sv{font-family:var(--f-num);font-weight:800;color:var(--lime);white-space:nowrap}
 .save{flex-wrap:wrap!important;white-space:normal!important;row-gap:4px}.save b,.save>span{white-space:nowrap}.save>span{margin-left:auto}
 .card *{min-width:0}
+
+.seedbtn{border-color:var(--lime)!important;font-weight:700}
+.seedbtn.on{background:var(--lime);color:var(--on-lime);border-color:var(--lime)!important}
+.seedp{flex-basis:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.seedp[hidden]{display:none}
+.seedp label{display:grid;gap:4px;font-size:12px;font-weight:700;color:var(--muted)}
+.seedp input,.seedp select{height:38px;border:1px solid var(--line-strong);border-radius:10px;padding:0 10px;font:600 14px var(--f-body);background:var(--surface);color:var(--text);min-width:0}
+.seedp em{font-style:normal;font-size:12px;color:var(--good,#178a3e)}
+.sp-b{display:flex;gap:6px}.sp-b .btn{height:38px;flex:1;justify-content:center}
+.sp-n{grid-column:1/-1;margin:0;font-size:11.5px;color:var(--faint)}
+.seedok{font-size:12px;font-weight:800;color:var(--good,#178a3e);background:rgba(23,138,62,.08);border-radius:999px;padding:3px 9px;white-space:nowrap}
 </style>
 
 <header class="hero">
@@ -452,16 +463,24 @@ h1{font-size:clamp(34px,11.8vw,56px)!important}
   <button class="herobtn" id="heroMap">🗺 지도에서 경매 위치 보기</button>
 </div></section>
 <div class="fbar"><div class="in">
-  <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="단지명, 동, 사건번호" autocomplete="off"></label>
+  <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="단지명·동·사건번호" autocomplete="off"></label>
   <select id="gu" aria-label="구"><option value="">__REGION__ 전체</option></select>
   <div class="seg star" id="pick" role="group" aria-label="추천"></div>
   <select id="sort" aria-label="정렬"><option value="date">매각기일 빠른 순</option><option value="disc">시세 대비 싼 순</option><option value="min">최저가 낮은 순</option></select>
   <div class="seg view" id="view" role="group" aria-label="보기 방식"><button data-v="list" aria-pressed="true">목록</button><button data-v="map" aria-pressed="false">지도로 보기</button></div>
   <button class="more" id="moreBtn" aria-expanded="false" aria-controls="adv">조건 더보기</button>
+  <button class="more seedbtn" id="seedBtn" aria-expanded="false" aria-controls="seedp" title="내 현금으로 살 수 있는 물건만 보기">💰 내 시드</button>
   <div class="adv" id="adv" hidden>
     <div class="seg" id="price" role="group" aria-label="최저가"></div>
     <div class="seg" id="size" role="group" aria-label="평형"></div>
     <div class="seg" id="fail" role="group" aria-label="유찰"></div>
+  </div>
+  <div class="seedp" id="seedp" hidden>
+    <label><span>내 현금(만원) <em id="sEqT"></em></span><input id="sEq" type="number" step="1000" min="0" placeholder="예: 20000"></label>
+    <label>보유 주택<select id="sOwn"><option value="none">무주택</option><option value="first">생애최초</option><option value="one">1주택(처분 조건)</option><option value="multi">다주택</option></select></label>
+    <label>연소득(만원, 선택)<input id="sInc" type="number" step="100" min="0" placeholder="넣으면 DSR 반영"></label>
+    <div class="sp-b"><button class="btn lime" id="sApply">조회</button><button class="btn" id="sOff">해제</button></div>
+    <p class="sp-n">최저가에 낙찰받는다고 가정 · 대출(2026.10 규제, 금리 4.5%) · 취득세·법무비 · 인수 보증금 · 명도비 500만 포함 · 참고용 계산</p>
   </div>
 </div></div>
 
@@ -493,7 +512,7 @@ const SIZES=[["평형 전체",0,999],["~12평",0,40],["12~20평",40,65],["25평�
 const FAILS=[["유찰 전체",-1],["신건",0],["1회+",1],["2회+",2]];
 const PICKS=[["전체"],["🔥 추천"],["✅ bid PICK"]];
 const WK="일월화수목금토";
-const st={q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date",view:"list"};
+const st={q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date",view:"list",seed:null};
 const $=id=>document.getElementById(id);
 const eok=v=>{if(v==null)return"—";if(v<1e8)return Math.round(v/1e4).toLocaleString()+"만";const e=v/1e8;return (e>=10?e.toFixed(1):e.toFixed(2)).replace(/\.?0+$/,"")+"억"};
 const won=v=>{if(v==null)return"—";const e=Math.floor(v/1e8),m=Math.round(v%1e8/1e4);return (e?e+"억 ":"")+(m?m.toLocaleString()+"만":"")||"0"};
@@ -561,7 +580,22 @@ guSel.onchange=e=>{st.gu=e.target.value;render()};
 $("sort").onchange=e=>{st.sort=e.target.value;render()};
 $("q").oninput=e=>{st.q=e.target.value.trim();render()};
 $("moreBtn").onclick=()=>{const a=$("adv");a.hidden=!a.hidden;$("moreBtn").setAttribute("aria-expanded",!a.hidden)};
-$("reset").onclick=()=>{Object.assign(st,{q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date"});$("q").value="";guSel.value="";$("sort").value="date";segs();drawDays();render()};
+$("reset").onclick=()=>{Object.assign(st,{q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date",seed:null});$("seedBtn").classList.remove("on");$("q").value="";guSel.value="";$("sort").value="date";segs();drawDays();render()};
+
+/* seed filter */
+function seedNeed(x,sd){const bid=x.min;const {L}=loanMax(x,bid,sd.own,sd.inc,0.045);const reg=regInfo(x).reg;return bid-L+acqTax(bid,sd.own,reg)+(x.rc==="인수있음"?(x.burden||0):0)+5e6}
+function seedGap(x){if(!st.seed)return 0;if(st.seed.own==="multi"&&regInfo(x).reg)return -1;return st.seed.eq-seedNeed(x,st.seed)}
+(()=>{const sp=$("seedp"),bt=$("seedBtn");const wn=v=>v>0?eok(v*1e4):"";
+ $("sEq").oninput=e=>$("sEqT").textContent=wn(+e.target.value);
+ bt.onclick=()=>{sp.hidden=!sp.hidden;bt.setAttribute("aria-expanded",!sp.hidden);if(!sp.hidden)$("sEq").focus()};
+ const apply=()=>{const eq=+$("sEq").value;if(!(eq>0)){toast("내 현금을 만원 단위로 입력해 주세요");return}
+  st.seed={eq:eq*1e4,own:$("sOwn").value,inc:(+$("sInc").value||0)*1e4};bt.classList.add("on");
+  try{localStorage.setItem("seed",JSON.stringify({eq,own:st.seed.own,inc:+$("sInc").value||0}))}catch(e){}sp.hidden=true;bt.setAttribute("aria-expanded",false);render();
+  document.getElementById("list-top").scrollIntoView({behavior:"smooth"})};
+ $("sApply").onclick=apply;$("sEq").onkeydown=e=>{if(e.key==="Enter")apply()};
+ $("sOff").onclick=()=>{st.seed=null;bt.classList.remove("on");try{localStorage.removeItem("seed")}catch(e){}render()};
+ try{const v=JSON.parse(localStorage.getItem("seed")||"null");if(v){$("sEq").value=v.eq;$("sOwn").value=v.own;if(v.inc)$("sInc").value=v.inc;$("sEqT").textContent=wn(v.eq)}}catch(e){}
+})();
 
 const COURTN=__COURTN__;
 function caseText(c){const x=DATA.find(d=>d.case===c);return x?(COURTN[x.court]||x.court)+" "+x.case+(x.name?" ("+x.name+")":""):c}
@@ -791,10 +825,11 @@ function render(){
   let r=DATA.filter(x=>(!st.gu||x.gu===st.gu)&&(!st.day||x.date===st.day)&&x.min>=p0&&x.min<p1
     &&(st.size===0||(x.m2&&x.m2>=s0&&x.m2<s1))&&(f0<0||(f0===0?x.fail===0:(x.fail||0)>=f0))
     &&(st.pick===0||(st.pick===1?(x.cand||x.rec):x.rec))
-    &&(!q||(x.name+x.dong+x.gu+x.case+x.ho).toLowerCase().includes(q)));
+    &&(!q||(x.name+x.dong+x.gu+x.case+x.ho).toLowerCase().includes(q))
+    &&(!st.seed||seedGap(x)>=0));
   r.sort(st.sort==="date"?(a,b)=>a.date.localeCompare(b.date)||(b.rec-a.rec)||(b.cand-a.cand)||((disc(b)??-99)-(disc(a)??-99))
     :st.sort==="disc"?(a,b)=>(disc(b)??-99)-(disc(a)??-99):(a,b)=>a.min-b.min);
-  $("count").innerHTML=`<b>${r.length}</b>건 표시 · 전체 ${DATA.length}건`;
+  $("count").innerHTML=`<b>${r.length}</b>건 표시 · 전체 ${DATA.length}건`+(st.seed?` · <span class="seedok">💰 내 현금 ${eok(st.seed.eq)}으로 가능</span>`:"");
   const L=$("list");
   $("bigmap").hidden=st.view!=="map";L.hidden=st.view==="map";
   if(st.view==="map"){drawPins(r);return}
