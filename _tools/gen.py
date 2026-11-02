@@ -75,9 +75,14 @@ for c in SRC:
         if r.get('flag') and not x['flag']: x['flag']=r['flag']
     elif c.get('rc'):
         x['rc']=c['rc']; x['rwhy']=c.get('why','')
+        if x['rc']=='인수없음' and x['rwhy'].startswith('임차인 있으나 대항력 없음'):
+            # 2026.11.2 자동판정 오류(대항력 '있음' 임차인 누락) — 재점검 전까지 확인필요로 보수 표시
+            x['rc']='확인필요'; x['rwhy']='임차인 있음 · 대항력(인수 여부) 재점검 중 — 입찰 전 매각물건명세서 확인 필수'
         if c.get('burden'): x['burden']=c['burden']
     if c['case'] in PICK and cnt[c['case']]==1: x.update(PICK[c['case']]); x['rights']=True
     x['taken']=c['case'] in TAKEN
+    if '지분' in (x.get('flag') or '') and x.get('rc')!='인수있음':
+        x['rc']='확인필요'; x['rwhy']='지분 매각 — 집 전체가 아닌 일부 지분이라 같은 평형 시세와 비교 불가 · 공유자 우선매수·단독 사용 어려움'
     D.append(x)
 for x in D:
     d = 1-x['min']/x['mkt'] if x['mkt'] else None
