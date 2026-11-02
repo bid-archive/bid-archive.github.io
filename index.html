@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>bid.archive 적중 기록</title>
-<meta name="description" content="서울·경기·부산 아파트 경매 예상낙찰가와 실제 결과를 전부 공개하는 적중 기록">
-<meta property="og:title" content="bid.archive 경매 예상낙찰가 적중 기록">
+<title>bid.archive 아파트 경매</title>
+<meta name="description" content="서울·경기·인천·대전·부산 진행 중인 아파트 경매 전부. 실거래가·인수 판정·내 시드 조회·대출 계산, 예상낙찰가와 결과까지 공개">
+<meta property="og:title" content="bid.archive · 진행 중인 아파트 경매 한 번에">
 <meta property="og:description" content="매주 예상낙찰가를 먼저 공개하고, 결과까지 전부 남깁니다.">
 <meta property="og:image" content="112971-1.jpg">
 <style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}.regions-hub{display:grid;gap:12px;margin:8px 0 28px;padding:22px;border-radius:18px;background:#121212;color:#f4f4f0}
@@ -128,6 +128,14 @@ footer{font-size:12px;color:var(--sub);border-top:1px solid var(--line);padding-
 .golist .garrow{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:#c6f432;color:#121212;display:grid;place-items:center;font-size:22px;font-weight:900}
 .golist:hover .garrow{transform:translateX(3px)}
 @media (prefers-reduced-motion:no-preference){.uc,.stat{transition:transform .15s}.uc:hover{transform:translateY(-2px)}}
+.soon{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:10px}
+.sn{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--ink);text-decoration:none;min-width:0}
+.sn:hover{border-color:var(--ink)}
+.sn .d{font-family:var(--f-num);font-size:12px;font-weight:600;background:var(--ink);color:var(--paper);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.sn .t{min-width:0}.sn .t b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sn .t small{font-size:12px;color:var(--sub)}
+.sn .g{text-align:right;white-space:nowrap}.sn .g b{display:block;font-family:var(--f-num);font-size:15px;color:var(--hit)}.sn .g small{font-size:11px;color:var(--sub)}
+.rh span b{color:#c6f432;font-weight:800;font-size:inherit}.rh span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.rh i{display:none}.rh{grid-template-columns:1fr;padding:14px}}
 </style>
 
 <div class="wrap">
@@ -135,32 +143,42 @@ footer{font-size:12px;color:var(--sub);border-top:1px solid var(--line);padding-
   <header class="top">
     <a class="mark" href="https://www.instagram.com/bid.archive/" target="_blank" rel="noopener"><i>BID</i>bid.archive</a>
     <nav class="links">
-      <a class="btn" href="#regions">경매 물건 보기</a>
+      <a class="btn" href="#record">적중 기록</a>
       <a class="btn" href="https://www.threads.com/@bid.archive" target="_blank" rel="noopener">스레드</a>
       <a class="btn fill" href="https://www.instagram.com/bid.archive/" target="_blank" rel="noopener">인스타 팔로우</a>
     </nav>
   </header>
 
   <section class="hero">
-    <h1>경매 예상낙찰가,<br><em>결과로</em> 증명합니다</h1>
-    <p>서울·경기·인천·대전·부산 아파트 경매를 매주 골라 예상낙찰가를 먼저 공개하고, 매각기일이 지나면 실제 낙찰가와 비교합니다. 틀린 예측도 지우지 않고 전부 남깁니다. 진행 중인 경매 물건 전체는 실거래가와 함께 경매 물건 페이지에서 볼 수 있습니다. 강의·회원제는 없습니다. 살 집 한 채가 경매에 나왔을 때, 그 한 건만 확인해 드립니다.</p>
-    <div class="stats">
+    <h1>진행 중인 아파트 경매,<br><em>한 번에</em> 찾아보세요</h1>
+    <p>서울·경기·인천·대전·부산 진행 중인 아파트 경매 전부를 실거래가와 함께 정리했습니다. 내 현금으로 가능한 물건만 골라 보고, 대출·취득세까지 바로 계산해 보세요. 무료, 매일 새벽 갱신.</p>
+  </section>
+
+  <section class="regions-hub" id="regions">
+    <div class="rh-k">지역을 고르세요</div>
+    <div class="rh-grid">
+      <a class="rh" href="/seoul/"><b>서울</b><span data-r="seoul">서울 5개 지법</span><i>→</i></a>
+      <a class="rh" href="/gyeonggi/"><b>경기·인천</b><span data-r="gyeonggi">의정부·인천·수원지법</span><i>→</i></a>
+      <a class="rh" href="/daejeon/"><b>대전</b><span data-r="daejeon">대전광역시</span><i>→</i></a>
+      <a class="rh" href="/busan/"><b>부산</b><span data-r="busan">부산 본원·동부·서부</span><i>→</i></a>
+    </div>
+    <p class="rh-s">🔥 추천 · 💰 내 시드 조회 · 대출·취득세 계산 · 실거래 · 인수 판정 · 지도 · <span id="rhUpd">매일 새벽 갱신</span></p>
+  </section>
+
+
+  <section id="soonSec" hidden>
+    <div class="sec-h"><h2>🔥 곧 매각되는 추천 물건</h2><span class="note">시세보다 싸고 인수 권리 없는 물건 · 누르면 상세</span></div>
+    <div class="soon" id="soon"></div>
+  </section>
+
+  <section id="record">
+    <div class="sec-h"><h2>적중 기록</h2><span class="note">예상낙찰가를 매각 전에 공개하고, 틀려도 지우지 않습니다</span></div>
+    <div class="stats" style="margin-top:0">
       <div class="stat"><div class="k">누적 예측</div><div class="v" id="sTotal">0</div><div class="s" id="sTotalS">건</div></div>
       <div class="stat"><div class="k">적중률 (±5%)</div><div class="v" id="sHit">–</div><div class="s" id="sHitS">결과 확인 0건</div></div>
       <div class="stat"><div class="k">평균 오차</div><div class="v" id="sErr">–</div><div class="s">예상가 vs 낙찰가</div></div>
       <div class="stat"><div class="k">결과 대기</div><div class="v" id="sWait">0</div><div class="s">건</div></div>
     </div>
-  </section>
-
-  <section class="regions-hub" id="regions">
-    <div class="rh-k">진행 중인 아파트 경매 보기</div>
-    <div class="rh-grid">
-      <a class="rh" href="/seoul/"><b>서울</b><span>중앙·동부·서부·남부·북부지법</span><i>→</i></a>
-      <a class="rh" href="/gyeonggi/"><b>경기·인천</b><span>의정부·인천·수원지법(지원 포함)</span><i>→</i></a>
-      <a class="rh" href="/daejeon/"><b>대전</b><span>대전지법 본원 · 대전광역시</span><i>→</i></a>
-      <a class="rh" href="/busan/"><b>부산</b><span>부산지법 본원·동부·서부지원</span><i>→</i></a>
-    </div>
-    <p class="rh-s">✅ bid PICK · 🔥 추천 · 지도 · 실거래 · 전월세 · 인수 판정 · 매일 새벽 갱신</p>
   </section>
 
   <section>
@@ -315,5 +333,18 @@ document.getElementById("chips").addEventListener("click", e => {
   render();
 });
 render();
+
+/* 지역별 현황 + 곧 매각 추천 (각 지역 stats.json) */
+(async()=>{const R=["seoul","gyeonggi","daejeon","busan"];const T=new Date(new Date(Date.now()+9*36e5).toISOString().slice(0,10)+"T00:00:00");
+ const ek=v=>v>=1e8?(Math.round(v/1e7)/10)+"억":Math.round(v/1e4).toLocaleString()+"만";
+ const all=[];let upd="";
+ await Promise.all(R.map(async r=>{try{const j=await (await fetch("/"+r+"/stats.json",{cache:"no-cache"})).json();
+  const sp=document.querySelector('[data-r="'+r+'"]');if(sp)sp.innerHTML="<b>"+j.total.toLocaleString()+"</b>건 · 🔥 <b>"+j.cand+"</b>";
+  if(j.updated&&j.updated>upd)upd=j.updated;(j.soon||[]).forEach(x=>all.push(Object.assign({r,rn:j.name},x)))}catch(e){}}));
+ if(upd)document.getElementById("rhUpd").textContent="업데이트 "+upd;
+ const L=all.map(x=>Object.assign(x,{dd:Math.round((new Date(x.date+"T00:00:00")-T)/864e5)})).filter(x=>x.dd>=1).sort((a,b)=>a.dd-b.dd||b.gap-a.gap).filter((x,i,A)=>A.slice(0,i).filter(y=>y.r===x.r).length<2).slice(0,8);
+ if(!L.length)return;document.getElementById("soonSec").hidden=false;
+ document.getElementById("soon").innerHTML=L.map(x=>'<a class="sn" href="/'+x.r+'/#p='+x.pid+'"><span class="d">'+(x.dd?"D-"+x.dd:"D-DAY")+'</span><span class="t"><b>'+x.name.replace(/[<>&]/g,"")+'</b><small>'+x.rn+" "+x.gu+(x.py?" · "+x.py+"평":"")+" · 최저 "+ek(x.min)+'</small></span><span class="g"><b>-'+ek(x.gap)+'</b><small>최근 거래 대비</small></span></a>').join("");
+})();
 </script>
 </html>
