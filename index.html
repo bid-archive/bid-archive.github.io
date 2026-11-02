@@ -6,14 +6,7 @@
 <meta property="og:title" content="bid.archive · 진행 중인 아파트 경매 한 번에">
 <meta property="og:description" content="매주 예상낙찰가를 먼저 공개하고, 결과까지 전부 남깁니다.">
 <meta property="og:image" content="112971-1.jpg">
-<style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}.regions-hub{display:grid;gap:12px;margin:8px 0 28px;padding:22px;border-radius:18px;background:#121212;color:#f4f4f0}
-.rh-k{font-size:12px;font-weight:700;letter-spacing:.08em;color:#c6f432}
-.rh-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.rh{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;padding:16px 16px;border:1px solid #2f2f2b;border-radius:14px;color:#f4f4f0;text-decoration:none;min-width:0}
-.rh b{font-size:19px;font-weight:900}.rh span{grid-column:1;font-size:12px;color:#a3a39a}
-.rh i{grid-row:1/3;grid-column:2;font-style:normal;width:36px;height:36px;border-radius:50%;background:#c6f432;color:#121212;display:grid;place-items:center;font-weight:900}
-.rh:hover{border-color:#c6f432}.rh-s{margin:0;font-size:12.5px;color:#a3a39a}
-@media (max-width:640px){.rh-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+<style>*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif}img{max-width:100%}@media (max-width:640px){}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -134,18 +127,20 @@ footer{font-size:12px;color:var(--sub);border-top:1px solid var(--line);padding-
 .sn .d{font-family:var(--f-num);font-size:12px;font-weight:600;background:var(--ink);color:var(--paper);border-radius:999px;padding:3px 8px;white-space:nowrap}
 .sn .t{min-width:0}.sn .t b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sn .t small{font-size:12px;color:var(--sub)}
 .sn .g{text-align:right;white-space:nowrap}.sn .g b{display:block;font-family:var(--f-num);font-size:15px;color:var(--hit)}.sn .g small{font-size:11px;color:var(--sub)}
-.rh span b{color:#c6f432;font-weight:800;font-size:inherit}.rh span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media (max-width:640px){.rh i{display:none}.rh{grid-template-columns:1fr;padding:14px}}
-.rh-k{font-size:15px!important}
-.rh{padding:20px 20px!important;gap:6px 12px!important}
-.rh b{font-size:26px!important}
-.rh span{font-size:16px!important;color:#d4d4cc!important}
-.rh span b{font-size:18px!important}
-.rh-s{font-size:14.5px!important;line-height:1.6}
-.rh i{width:44px!important;height:44px!important;font-size:20px}
-@media (max-width:640px){.rh b{font-size:24px!important}.rh span{font-size:15px!important;white-space:normal!important;overflow:visible!important}.regions-hub{padding:20px 16px!important}.rh-grid{gap:10px!important}}
+@media (max-width:640px){}
 body,p,h1,h2,span,div{word-break:keep-all;overflow-wrap:break-word}
 .hero p,.hero h1{text-wrap:pretty}
+.rgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.rt{background:var(--tile);color:var(--tile-fg);border-radius:16px;padding:16px 18px;text-decoration:none;display:flex;flex-direction:column;gap:14px;min-width:0;border:1.5px solid transparent;transition:border-color .15s}
+.rt:hover{border-color:var(--lime)}
+.rt-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rt-n{font-size:20px;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+.rt-go{font-size:13px;font-weight:700;opacity:.6;white-space:nowrap}
+.rt-v{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rt-v b{display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(26px,5vw,34px);line-height:1.05;font-variant-numeric:tabular-nums}
+.rt-v b.lm{color:var(--lime)}
+.rt-v small{font-size:12.5px;opacity:.7}
+@media (max-width:640px){.rgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.rt-go{display:none}}
 </style>
 
 <div class="wrap">
@@ -164,15 +159,14 @@ body,p,h1,h2,span,div{word-break:keep-all;overflow-wrap:break-word}
     <p>서울·경기·인천·대전·부산 진행 중인 아파트 경매 전부를 실거래가와 함께 정리했습니다. 내 현금으로 가능한 물건만 골라 보고, 대출·취득세까지 바로 계산해 보세요. 무료, 매일 새벽 갱신.</p>
   </section>
 
-  <section class="regions-hub" id="regions">
-    <div class="rh-k">지역을 고르세요</div>
-    <div class="rh-grid">
-      <a class="rh" href="/seoul/"><b>서울</b><span data-r="seoul">서울 5개 지법</span><i>→</i></a>
-      <a class="rh" href="/gyeonggi/"><b>경기·인천</b><span data-r="gyeonggi">의정부·인천·수원지법</span><i>→</i></a>
-      <a class="rh" href="/daejeon/"><b>대전</b><span data-r="daejeon">대전광역시</span><i>→</i></a>
-      <a class="rh" href="/busan/"><b>부산</b><span data-r="busan">부산 본원·동부·서부</span><i>→</i></a>
+  <section id="regions">
+    <div class="sec-h"><h2>지역별 진행 경매</h2><span class="note" id="rhUpd">매일 새벽 업데이트</span></div>
+    <div class="rgrid">
+      <a class="rt" href="/seoul/"><div class="rt-h"><span class="rt-n">서울</span><span class="rt-go">보기 →</span></div><div class="rt-v"><div><b data-t="seoul">–</b><small>진행 중</small></div><div><b class="lm" data-c="seoul">–</b><small>추천</small></div></div></a>
+      <a class="rt" href="/gyeonggi/"><div class="rt-h"><span class="rt-n">경기·인천</span><span class="rt-go">보기 →</span></div><div class="rt-v"><div><b data-t="gyeonggi">–</b><small>진행 중</small></div><div><b class="lm" data-c="gyeonggi">–</b><small>추천</small></div></div></a>
+      <a class="rt" href="/daejeon/"><div class="rt-h"><span class="rt-n">대전</span><span class="rt-go">보기 →</span></div><div class="rt-v"><div><b data-t="daejeon">–</b><small>진행 중</small></div><div><b class="lm" data-c="daejeon">–</b><small>추천</small></div></div></a>
+      <a class="rt" href="/busan/"><div class="rt-h"><span class="rt-n">부산</span><span class="rt-go">보기 →</span></div><div class="rt-v"><div><b data-t="busan">–</b><small>진행 중</small></div><div><b class="lm" data-c="busan">–</b><small>추천</small></div></div></a>
     </div>
-    <p class="rh-s">🔥 추천 · 💰 내 시드 조회 · 대출·취득세 계산 · 실거래 · 인수 판정 · 지도 · <span id="rhUpd">매일 새벽 갱신</span></p>
   </section>
 
 
@@ -344,9 +338,9 @@ render();
  const ek=v=>v>=1e8?(Math.round(v/1e7)/10)+"억":Math.round(v/1e4).toLocaleString()+"만";
  const all=[];let upd="";
  await Promise.all(R.map(async r=>{try{const j=await (await fetch("/"+r+"/stats.json",{cache:"no-cache"})).json();
-  const sp=document.querySelector('[data-r="'+r+'"]');if(sp)sp.innerHTML="진행 <b>"+j.total.toLocaleString()+"</b>건<br>🔥 추천 <b>"+j.cand+"</b>건";
+  const t=document.querySelector('[data-t="'+r+'"]'),c=document.querySelector('[data-c="'+r+'"]');if(t)t.textContent=j.total.toLocaleString();if(c)c.textContent=j.cand;
   if(j.updated&&j.updated>upd)upd=j.updated;(j.soon||[]).forEach(x=>all.push(Object.assign({r,rn:j.name},x)))}catch(e){}}));
- if(upd)document.getElementById("rhUpd").textContent="업데이트 "+upd;
+ if(upd)document.getElementById("rhUpd").textContent="매일 새벽 업데이트 · 마지막 "+upd;
 })();
 </script>
 </html>
