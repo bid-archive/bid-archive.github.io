@@ -93,5 +93,31 @@ _soon=sorted([x for x in D if x['cand'] and x['date']>=_today and _gap(x)>0],key
 STATS=dict(region=REG,name=CFG['name'],total=len(D),cand=sum(1 for x in D if x['cand']),updated=html.split('마지막 업데이트 <b class="num">')[1].split('<')[0] if '마지막 업데이트 <b class="num">' in html else '',
   soon=[dict(pid=x['pid'],name=x['name'],gu=x['gu'],date=x['date'],min=x['min'],gap=_gap(x),py=round(x['m2']/3.3058) if x.get('m2') else None) for x in _soon])
 os.makedirs('/home/claude/busan/ghsite/'+REG,exist_ok=True)
+# --- 모델 예측 기록 (매각 전에 남겨 두고, 결과와 비교) ---
+def _eokf(v): return f"{v/1e8:.2f}".rstrip('0').rstrip('.')+'억'
+RATIO={'seoul':.95,'gyeonggi':.88,'busan':.85,'daejeon':.87}
+def model_pred(x):
+    if not x.get('mkt'):
+        p=x['min']*1.05; why='실거래 없음 → 최저가+5%'
+    else:
+        r=RATIO.get(REG,.88); parts=[f"{x.get('basis','시세')} {_eokf(x['mkt'])}×{round(r*100)}%"]
+        if (x.get('fail') or 0)>=2: r-=.03; parts.append(f"유찰 {x['fail']}회 -3%p")
+        p=x['mkt']*r
+        if x.get('rc')=='인수있음' and x.get('burden'): p-=x['burden']; parts.append(f"인수 보증금 -{_eokf(x['burden'])}")
+        if p<x['min']: p=x['min']*1.02; parts.append('최저가 근처')
+        why=' · '.join(parts)
+    return int(round(p/1e6)*1e6), why
+try:
+    import urllib.request
+    PREDS=json.loads(urllib.request.urlopen(f"https://raw.githubusercontent.com/bid-archive/bid-archive.github.io/main/{REG}/preds.json?t={os.getpid()}",timeout=20).read().decode())
+except Exception as e:
+    PREDS={}
+_cut=(__import__('datetime').datetime.now()-__import__('datetime').timedelta(days=30)).strftime('%Y-%m-%d')
+PREDS={k:v for k,v in PREDS.items() if v.get('date','')>=_cut}
+for x in D:
+    if x['date']>=_today and str(x['pid']) not in PREDS:
+        p,w=model_pred(x)
+        PREDS[str(x['pid'])]=dict(case=x['case'],court=x['court'],name=x['name'],gu=x['gu'],date=x['date'],min=x['min'],mkt=x.get('mkt'),pred=p,why=w,at=_today)
+open('/home/claude/busan/ghsite/'+REG+'/preds.json','w').write(json.dumps(PREDS,ensure_ascii=False))
 open('/home/claude/busan/ghsite/'+REG+'/stats.json','w').write(json.dumps(STATS,ensure_ascii=False))
 print(len(D), sum(x['cand'] for x in D), [x['name'] for x in D if x['cand']])
