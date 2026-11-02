@@ -596,6 +596,8 @@ $("q").oninput=e=>{st.q=e.target.value.trim();render()};
 $("moreBtn").onclick=()=>{const a=$("adv");a.hidden=!a.hidden;$("moreBtn").setAttribute("aria-expanded",!a.hidden)};
 $("reset").onclick=()=>{Object.assign(st,{q:"",gu:"",day:"",price:0,size:0,fail:0,pick:0,sort:"date",seed:null});$("seedBtn").classList.remove("on");$("q").value="";guSel.value="";$("sort").value="date";segs();drawDays();render()};
 
+/* deep link: #p=<pid> */
+setTimeout(()=>{const m=location.hash.match(/^#p=(\d+)/);if(m){const x=DATA.find(d=>String(d.pid)===m[1]);if(x)openSheet(x)}},300);
 /* seed filter */
 function seedNeed(x,sd){const bid=x.min;const {L}=loanMax(x,bid,sd.own,sd.inc,0.045);const reg=regInfo(x).reg;return bid-L+acqTax(bid,sd.own,reg)+(x.rc==="인수있음"?(x.burden||0):0)+5e6}
 function seedGap(x){if(!st.seed)return 0;if(st.seed.own==="multi"&&regInfo(x).reg)return -1;return st.seed.eq-seedNeed(x,st.seed)}
