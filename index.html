@@ -136,6 +136,14 @@ footer{font-size:12px;color:var(--sub);border-top:1px solid var(--line);padding-
 .sn .g{text-align:right;white-space:nowrap}.sn .g b{display:block;font-family:var(--f-num);font-size:15px;color:var(--hit)}.sn .g small{font-size:11px;color:var(--sub)}
 .rh span b{color:#c6f432;font-weight:800;font-size:inherit}.rh span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:640px){.rh i{display:none}.rh{grid-template-columns:1fr;padding:14px}}
+.rh-k{font-size:15px!important}
+.rh{padding:20px 20px!important;gap:6px 12px!important}
+.rh b{font-size:26px!important}
+.rh span{font-size:16px!important;color:#d4d4cc!important}
+.rh span b{font-size:18px!important}
+.rh-s{font-size:14.5px!important;line-height:1.6}
+.rh i{width:44px!important;height:44px!important;font-size:20px}
+@media (max-width:640px){.rh b{font-size:24px!important}.rh span{font-size:15px!important;white-space:normal!important;overflow:visible!important}.regions-hub{padding:20px 16px!important}.rh-grid{gap:10px!important}}
 </style>
 
 <div class="wrap">
@@ -165,11 +173,6 @@ footer{font-size:12px;color:var(--sub);border-top:1px solid var(--line);padding-
     <p class="rh-s">🔥 추천 · 💰 내 시드 조회 · 대출·취득세 계산 · 실거래 · 인수 판정 · 지도 · <span id="rhUpd">매일 새벽 갱신</span></p>
   </section>
 
-
-  <section id="soonSec" hidden>
-    <div class="sec-h"><h2>🔥 곧 매각되는 추천 물건</h2><span class="note">시세보다 싸고 인수 권리 없는 물건 · 누르면 상세</span></div>
-    <div class="soon" id="soon"></div>
-  </section>
 
   <section id="record">
     <div class="sec-h"><h2>적중 기록</h2><span class="note">예상낙찰가를 매각 전에 공개하고, 틀려도 지우지 않습니다</span></div>
@@ -339,12 +342,9 @@ render();
  const ek=v=>v>=1e8?(Math.round(v/1e7)/10)+"억":Math.round(v/1e4).toLocaleString()+"만";
  const all=[];let upd="";
  await Promise.all(R.map(async r=>{try{const j=await (await fetch("/"+r+"/stats.json",{cache:"no-cache"})).json();
-  const sp=document.querySelector('[data-r="'+r+'"]');if(sp)sp.innerHTML="<b>"+j.total.toLocaleString()+"</b>건 · 🔥 <b>"+j.cand+"</b>";
+  const sp=document.querySelector('[data-r="'+r+'"]');if(sp)sp.innerHTML="진행 <b>"+j.total.toLocaleString()+"</b>건<br>🔥 추천 <b>"+j.cand+"</b>건";
   if(j.updated&&j.updated>upd)upd=j.updated;(j.soon||[]).forEach(x=>all.push(Object.assign({r,rn:j.name},x)))}catch(e){}}));
  if(upd)document.getElementById("rhUpd").textContent="업데이트 "+upd;
- const L=all.map(x=>Object.assign(x,{dd:Math.round((new Date(x.date+"T00:00:00")-T)/864e5)})).filter(x=>x.dd>=1).sort((a,b)=>a.dd-b.dd||b.gap-a.gap).filter((x,i,A)=>A.slice(0,i).filter(y=>y.r===x.r).length<2).slice(0,8);
- if(!L.length)return;document.getElementById("soonSec").hidden=false;
- document.getElementById("soon").innerHTML=L.map(x=>'<a class="sn" href="/'+x.r+'/#p='+x.pid+'"><span class="d">'+(x.dd?"D-"+x.dd:"D-DAY")+'</span><span class="t"><b>'+x.name.replace(/[<>&]/g,"")+'</b><small>'+x.rn+" "+x.gu+(x.py?" · "+x.py+"평":"")+" · 최저 "+ek(x.min)+'</small></span><span class="g"><b>-'+ek(x.gap)+'</b><small>최근 거래 대비</small></span></a>').join("");
 })();
 </script>
 </html>
