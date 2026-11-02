@@ -680,7 +680,7 @@ function drawer(x){
    <div id="trBox">${trView(x,"sale")}</div>
    <div class="tiles">${tiles}</div>
    ${x.flag?`<div class="flagbox">⚠ ${esc(x.flag)} · 매각물건명세서를 꼭 확인하세요</div>`:""}
-   <div class="links"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">카카오맵</a><a class="btn" href="https://m.land.naver.com/search/result/${encodeURIComponent(x.gu+" "+x.name)}" target="_blank" rel="noopener">네이버부동산</a><a class="btn" href="https://hogangnono.com/search?q=${encodeURIComponent(x.name.replace(/아파트$/,""))}" target="_blank" rel="noopener">호갱노노</a><a class="btn court" href="${COURT_URL}" target="_blank" rel="noopener">법원경매정보 (사건번호 복사)</a></div>
+   <div class="links"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">카카오맵</a><a class="btn" href="https://m.land.naver.com/search/result/${encodeURIComponent(nvq(x))}" target="_blank" rel="noopener">네이버부동산</a><a class="btn" href="https://hogangnono.com/search?q=${encodeURIComponent(x.name.replace(/아파트$/,""))}" target="_blank" rel="noopener">호갱노노</a><a class="btn court" href="${COURT_URL}" target="_blank" rel="noopener">법원경매정보 (사건번호 복사)</a></div>
   </div>`}
 
 function ref(x){
@@ -745,6 +745,7 @@ function initCalc(x){const g=id=>document.getElementById(id);if(!g("calc"))retur
  <div class="kc-row"><span>입찰보증금(최저가 10%)</span><b>${won(Math.round(x.min*.1))}</b><small>입찰 당일 필요</small></div>
  <div class="kc-row big"><span>${mon}개월 뒤 매도 시 세전 차익</span><b class="${profit>=0?"ok":"ng"}">${profit>=0?"+":"−"}${won(Math.round(Math.abs(profit)))}</b><small>이자 ${won(Math.round(intr))} 포함 · 양도세 별도${mon<24?" (2년 미만 단기 양도세율 높음)":""}</small></div>`};
  ["cBid","cEq","cOwn","cInc","cRate","cSell","cEtc","cMon"].forEach(k=>{g(k).addEventListener("input",run);g(k).addEventListener("change",run)});run()}
+function nvq(x){const n=(x.name||"").replace(/\(.*?\)/g,"").replace(/(아파트|APT)$/i,"").replace(/[^가-힣A-Za-z0-9 ]/g," ").replace(/\s+/g," ").trim();return ((x.dong||"").replace(/\s.*$/,"")+" "+n).trim()}
 function openSheet(x){
   const d=disc(x);
   $("sheetBody").innerHTML=`
