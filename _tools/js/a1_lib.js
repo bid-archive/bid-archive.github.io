@@ -25,7 +25,7 @@ A1.parseRow=(reg,pid,t,law)=>{const R=A1.REG[reg];const o={pid,court:R.courts[la
  let rest;if(reg==='gyeonggi'){m=t.match(/인천광역시\s+(\S+[구군])\s+(.*?)\s+(산?\d+(?:-\d+)?)(?:\s*외\s*\d+필지)?\s*,\s*(.*?)\[/);if(m){o.sido='인천';o.gu='인천 '+m[1];o.dong=m[2];o.lot=m[3];rest=m[4]}else{m=t.match(/경기도\s+(\S+[시군])\s+(?:(\S+구)\s+)?(.*?)\s+(산?\d+(?:-\d+)?)(?:\s*외\s*\d+필지)?\s*,\s*(.*?)\[/);if(m){o.sido='경기';o.gu=m[1]+(m[2]?' '+m[2]:'');o.dong=m[3];o.lot=m[4];rest=m[5]}}}
  else{m=t.match(new RegExp(R.sido+'\\s+(\\S+[구군])\\s+(.*?)\\s+(산?\\d+(?:-\\d+)?)(?:\\s*외\\s*\\d+필지)?\\s*,\\s*(.*?)\\['));if(m){o.gu=m[1];o.dong=m[2];o.lot=m[3];rest=m[4]}}
  if(rest==null)return {pid,err:'addr'};rest=rest.trim();const k=rest.match(/^(.*?)\s*((?:\S+동\s*)?(?:지하)?\d+층.*)$/);if(k){o.name=k[1].trim();o.ho=k[2].replace(/(\d+층)\s*/,'$1 ').replace(/\s+/g,' ').trim()}else{o.name=rest;o.ho=''}
- m=t.match(/건물\s*([\d.]+)㎡/);o.m2=m?+m[1]:null;const tags=[...t.matchAll(/\[([^\]]*)\]/g)].map(x=>x[1]);o.tags=(tags[1]||'').replace(/\s*\/?\s*공시가격[^\/]*$/,'').trim();
+ m=t.match(/건물\s*([\d.]+)㎡/);o.m2=m?+m[1]:null;const tags=[...t.matchAll(/\[([^\]]*)\]/g)].map(x=>x[1]);o.tags=(tags.join(' / ')+(/지분\s*매각/.test(t)&&!/지분/.test(tags.join(''))?' / 지분 매각':'')).replace(/\s*\/?\s*공시가격[^\/]*$/,'').trim();
  m=t.match(/\]\s*(\d{1,3}(?:,\d{3})+)(\d{1,3}(?:,\d{3})+)\s*평당/);if(m){o.appr=+m[1].replace(/,/g,'');o.min=+m[2].replace(/,/g,'')}
  m=t.match(/유찰\s*(\d+)회/);o.fail=m?+m[1]:(/신건/.test(t)?0:null);m=t.match(/(\d{4})\.(\d\d)\.(\d\d)\(/);o.date=m?m[1]+'-'+m[2]+'-'+m[3]:null;
  const cs=R.SG[o.gu]||R.SG[(o.gu||'').split(' ')[0]]||null;o.sgs=cs;o.sg=cs?cs[0]:null;if(!o.min||!o.date||!o.sg)o.err=o.err||'field';return o};
@@ -44,20 +44,22 @@ A1.loadPrev=async(reg)=>{const b='https://raw.githubusercontent.com/bid-archive/
 // 3) 신규 물건 상세(권리) 수집: 이전 판정 없는 pid만
 A1.classify=(c,r)=>{const ten=r.ten||'',note=(r.note||'').replace(/주의사항/,''),tags=c.tags||'';const all=ten+' '+note;const o={hh:r.hh?+r.hh.replace(/,/g,''):null,use:r.use?+r.use:null,dongs:r.dongs?+r.dongs:null,wr:!!r.wr};
  const deps=[...ten.matchAll(/보\s*([\d,]+)원(?:\s*\/\s*월\s*[\d,]+원)?\s*(있음|없음|미상)/g)].map(m=>({d:+m[1].replace(/,/g,''),h:m[2]}));const waive=/대항력(은|을)?\s*포기|대항력을 포기/.test(all);
- const acc=/매수인에게 대항할 수 있는 임차인 있으며|매수인에게 대항할 수 있는[^.]{0,40}(임차권|전세권|임차인)/.test(all);const risk=/인수여지 있어 주의요함/.test(all);const other=[];
+ const acc=/매수인에게 대항할 수 있는 임차인 있으며|매수인에게 대항할 수 있는[^.]{0,40}(임차권|전세권|임차인)/.test(all);const risk=/인수여지 있어 주의요함/.test(all);const adv=deps.filter(x=>x.h==='있음');const buyIns=/매수인\s*인수/.test(ten);const other=[];
  if(/유치권/.test(note))other.push('유치권 신고');if(/법정지상권/.test(note))other.push('법정지상권');if(/가처분/.test(note)&&/소멸되지/.test(note))other.push('선순위 가처분');if(/가등기/.test(note)&&/소멸되지/.test(note))other.push('선순위 가등기');
- if(/지분/.test(tags))other.push('지분 매각');if(/대지권미등기/.test(tags))other.push('대지권 미등기');if(/위반건축/.test(tags))other.push('위반건축물');if((/토지별도등기인수/.test(tags)||/별도등기[^.]{0,40}인수/.test(note))&&!/구분지상권/.test(note))other.push('토지 별도등기 인수 조건');
+ if(/지분/.test(tags)||r.share)other.push('지분 매각(공유자 우선매수 가능·단독 사용 어려움)');if(/대지권미등기/.test(tags))other.push('대지권 미등기');if(/위반건축/.test(tags))other.push('위반건축물');if((/토지별도등기인수/.test(tags)||/별도등기[^.]{0,40}인수/.test(note))&&!/구분지상권/.test(note))other.push('토지 별도등기 인수 조건');
  const noTen=/임차인이 없으며|조사된 임차내역 없음/.test(ten);const own=/소유자[^.]{0,20}(점유|전입)/.test(ten);const eok=n=>{const e=n/1e8;return e>=1?(Math.round(e*100)/100)+'억':Math.round(n/1e4).toLocaleString()+'만'};
  if(waive){o.status='인수없음';o.why='선순위 임차권 있으나 HUG가 대항력 포기 확약 → 인수 없음'}
- else if(acc){const a=Math.max(0,...deps.filter(x=>x.h==='있음').map(x=>x.d));const nm=note.match(/보증금\s*([\d,]+)원/);const amt=a||(nm?+nm[1].replace(/,/g,''):0);o.status='인수있음';o.burden=amt||null;o.why=amt?`대항력 임차인 보증금 ${eok(amt)}, 배당 부족분 낙찰자 인수 → 총부담 약 ${eok(amt)} 이상`:'대항력 임차인 있음(보증금 확인 필요), 배당 부족분 낙찰자 인수'}
+ else if(acc||adv.length||buyIns||r.insu){const a=Math.max(0,...adv.map(x=>x.d));const nm=note.match(/보증금\s*([\d,]+)원/);const amt=a||(nm?+nm[1].replace(/,/g,''):0)||(r.insuAmt||0);const dist=/배당요구\s*:?\s*\d{4}/.test(ten)&&!/확정일자\s*:?\s*미상/.test(ten);o.burden=amt||null;
+  if(dist){o.status='확인필요';o.why=`대항력 있는 임차인(보증금 ${amt?eok(amt):'확인 필요'})이 배당요구 → 배당 못 받는 부족분은 낙찰자 인수`}
+  else{o.status='인수있음';o.why=amt?`대항력 있는 임차인·선순위 전세권 보증금 ${eok(amt)} 낙찰자 인수 (배당요구 없음) → 총부담 약 ${eok(amt)} 추가`:'대항력 있는 임차인(보증금 확인 필요) → 낙찰자 인수'}}
  else if(risk||other.length){o.status='확인필요';o.why=(risk?['말소기준보다 먼저 전입한 세대(보증금·권리신고 불명) → 임차인이면 인수 가능']:[]).concat(other).join(' · ')}
- else{o.status='인수없음';o.why=noTen?(own?'소유자 점유·임차인 없음':'임차인 없음'):(deps.length||/전입일자/.test(ten)?'임차인 있으나 대항력 없음 → 명도 필요':'임차인 없음')}
+ else{o.status='인수없음';o.why=noTen?(own?'소유자 점유·임차인 없음':'임차인 없음'):(deps.length||/전입일자/.test(ten)?'임차인 대항력 없음 → 명도 필요':'임차인 없음')}
  if(/구분지상권/.test(note))o.why+=' · 토지 구분지상권 인수(금전 부담 없음)';return o};
 A1.details=async(onlyNew=true)=>{window.DT=window.DT||{};window.DLOG=[];const seg=(v,a,bs,max)=>{const i=v.indexOf(a);if(i<0)return '';let j=v.length;for(const b of bs){const k=v.indexOf(b,i+a.length);if(k>0&&k<j)j=k}return A1.cl(v.slice(i,Math.min(j,i+60000))).slice(0,max)};
  for(const c of LCASES){if(onlyNew&&window.PREVP&&PREVP[c.pid]&&PREVP[c.pid].rc)continue;if(DT[c.pid]&&!DT[c.pid].err)continue;try{const v=await A1.dec('/auction/ca_view.php?product_id='+c.pid+'&line_num=1&line_tnum=1&person_hide=0');
   if(/login_box/.test(v.slice(0,5000))){window.LOGGED_OUT=true;break}const flat=v.replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' ');const g=re=>{const m=flat.match(re);return m?m[1]:null};
-  const r={hh:g(/총세대수\s*([\d,]+)\s*세대/),use:g(/사용승인\s*(\d{4})년/),dongs:g(/총동수\s*(\d+)개동/)};const reg=seg(v,'등기부현황',['전문가멘트','관리비 등 체납','현장조사 보고서'],4000);const ni=reg.indexOf('주의사항');
-  r.ten=seg(v,'임차인현황',['등기부현황'],1500);r.note=ni>=0?reg.slice(ni,ni+700).split('하루 보지 않기')[0]:'';r.cred=g(/채 권 자\s*(.{0,40}?)\s*구분/);r.wr=/우리은행|우리금융|우리에프앤아이|우리카드|우리캐피탈|더블유에스비|우리[가-힣]*유동화/.test(reg+' '+(r.cred||''));DT[c.pid]=r}catch(e){DT[c.pid]={err:String(e)}}
+  const r={share:/지분\s*매각/.test(flat),hh:g(/총세대수\s*([\d,]+)\s*세대/),use:g(/사용승인\s*(\d{4})년/),dongs:g(/총동수\s*(\d+)개동/)};const reg=seg(v,'등기부현황',['전문가멘트','관리비 등 체납','현장조사 보고서'],4000);const ni=reg.indexOf('주의사항');
+  r.ten=seg(v,'임차인현황',['등기부현황'],1500);{const ins=[...reg.matchAll(/(전세권|임차권)[^]{0,160}?(인수|소멸)/g)].filter(m=>m[2]==='인수');r.insu=ins.length>0;if(ins.length){const am=ins[0][0].match(/([\d,]{9,})원/);r.insuAmt=am?+am[1].replace(/,/g,''):0}}r.note=ni>=0?reg.slice(ni,ni+700).split('하루 보지 않기')[0]:'';r.cred=g(/채 권 자\s*(.{0,40}?)\s*구분/);r.wr=/우리은행|우리금융|우리에프앤아이|우리카드|우리캐피탈|더블유에스비|우리[가-힣]*유동화/.test(reg+' '+(r.cred||''));DT[c.pid]=r}catch(e){DT[c.pid]={err:String(e)}}
   DLOG.push(c.pid);await A1.sl(10000)}window.DDONE=true};
 // 4) 업로드 파일 만들기: 이전 판정·실거래 재사용 + 신규 병합 (MOUT_NEW는 molit.js 결과)
 A1.mkFiles=()=>{const out=LCASES.map(c=>{const o={pid:c.pid,court:c.court,case:c.case,item:c.item,name:c.name,sido:c.sido,gu:c.gu,dong:c.dong,lot:c.lot,ho:c.ho,m2:c.m2,appr:c.appr,min:c.min,fail:c.fail,date:c.date,sg:c.sg};
