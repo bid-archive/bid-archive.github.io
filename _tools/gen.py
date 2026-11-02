@@ -58,6 +58,7 @@ for c in SRC:
     x=dict(court=c['court'],case=case,pid=c['pid'],name=nm,gu=c['gu'],dong=c['dong'],ho=ho,m2=round(c['m2'],1) if c.get('m2') else None,
            fl=fl,date=c['date'],appr=c['appr'],min=c['min'],fail=c['fail'],flag=c.get('flag') or '',
            addr=f"{c.get('sido') or CFG['name']} {c['gu']} {c['dong']} {c['lot']}",mkt=None,mktN=0,conf=False,tr=[],rec=False,pred=None)
+    if c.get('nv'): x['nv']=c['nv']
     x['by']=BY.get(c['sg']+':'+c['dong']+'|'+c['lot']) or (str(c['use']) if c.get('use') else None)
     T.setdefault(case,T.pop(c['pid'],[]));
     if c['pid'] in R: R[case]=R.pop(c['pid'])

@@ -682,7 +682,7 @@ function drawer(x){
    <div id="trBox">${trView(x,"sale")}</div>
    <div class="tiles">${tiles}</div>
    ${x.flag?`<div class="flagbox">⚠ ${esc(x.flag)} · 매각물건명세서를 꼭 확인하세요</div>`:""}
-   <div class="links"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">카카오맵</a><a class="btn" href="https://m.land.naver.com/search/result/${encodeURIComponent(nvq(x))}" target="_blank" rel="noopener">네이버부동산</a><a class="btn" href="https://hogangnono.com/search?q=${encodeURIComponent(x.name.replace(/아파트$/,""))}" target="_blank" rel="noopener">호갱노노</a><a class="btn court" href="${COURT_URL}" target="_blank" rel="noopener">법원경매정보 (사건번호 복사)</a></div>
+   <div class="links"><a class="btn k" href="${kmap(x)}" target="_blank" rel="noopener">카카오맵</a><a class="btn" href="${x.nv?"https://new.land.naver.com/complexes/"+x.nv:"https://m.land.naver.com/search/result/"+encodeURIComponent(nvq(x))}" target="_blank" rel="noopener">네이버부동산</a><a class="btn" href="https://hogangnono.com/search?q=${encodeURIComponent(x.name.replace(/아파트$/,""))}" target="_blank" rel="noopener">호갱노노</a><a class="btn court" href="${COURT_URL}" target="_blank" rel="noopener">법원경매정보 (사건번호 복사)</a></div>
   </div>`}
 
 function ref(x){
