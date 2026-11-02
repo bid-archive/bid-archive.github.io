@@ -440,6 +440,13 @@ h1{font-size:clamp(34px,11.8vw,56px)!important}
 .prange{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .prange .pr-k{font-size:13px;font-weight:700;color:var(--muted)}
 .prange select{height:36px;border:1px solid var(--line);border-radius:10px;padding:0 8px;background:var(--surface);color:var(--text);font:600 13px var(--f-body)}
+.pager{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;padding:8px 0 28px}
+.pager:empty{display:none}
+.pager .pg{min-width:36px;height:38px;padding:0 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font:700 14px var(--f-num);cursor:pointer}
+.pager .pg.on{background:var(--ink,#111);color:var(--lime);border-color:var(--ink,#111)}
+.pager .pg:disabled{opacity:.35;cursor:default}
+.pager .pg-gap{color:var(--muted);padding:0 2px}
+.pager .pg-info{flex-basis:100%;text-align:center;font-size:12.5px;color:var(--muted)}
 </style>
 <style>:root{color-scheme:light}html,body{margin:0}img{max-width:100%}</style>
 </head>
@@ -506,6 +513,7 @@ h1{font-size:clamp(34px,11.8vw,56px)!important}
   <div class="meta"><span id="count"></span><button class="reset" id="reset">조건 초기화</button></div>
   <div class="bigmap" id="bigmap" hidden><div class="mapmsg">지도 불러오는 중…</div></div>
   <div class="grid" id="list"></div>
+  <nav class="pager" id="pager" aria-label="페이지"></nav>
 </main>
 
 <footer><div class="in">
@@ -848,7 +856,8 @@ async function drawPins(r){
     const ov=new K.maps.CustomOverlay({position:pos,content:d,yAnchor:1.15,clickable:true,zIndex:x.rec?3:x.cand?2:1});BIG.ovs.push(ov)}
   if(BIG.cl)BIG.cl.addMarkers(BIG.ovs);else BIG.ovs.forEach(o=>o.setMap(BIG.map));
   if(n)BIG.map.setBounds(bounds,40,40,40,40)}
-function render(){
+function render(keep){
+  if(!keep)st.page=1;
   const p0=st.pmin||0,p1=st.pmax||Infinity,[,s0,s1]=SIZES[st.size],f0=FAILS[st.fail][1],q=st.q.toLowerCase();
   let r=DATA.filter(x=>(!st.gu||x.gu===st.gu)&&(!st.day||x.date===st.day)&&x.min>=p0&&x.min<p1
     &&(st.size===0||(x.m2&&x.m2>=s0&&x.m2<s1))&&(f0<0||(f0===0?x.fail===0:(x.fail||0)>=f0))
@@ -860,9 +869,15 @@ function render(){
   $("count").innerHTML=`<b>${r.length}</b>건 표시 · 전체 ${DATA.length}건`+(st.seed?` · <span class="seedok">💰 내 현금 ${eok(st.seed.eq)}으로 가능</span>`:"");
   const L=$("list");
   $("bigmap").hidden=st.view!=="map";L.hidden=st.view==="map";
+  const PG=$("pager");PG.innerHTML="";
   if(st.view==="map"){drawPins(r);return}
   if(!r.length){L.innerHTML='<div class="empty">조건에 맞는 물건이 없어요. 조건을 넓히거나 초기화해 보세요.</div>';return}
-  L.innerHTML=r.map(card).join("");
+  const PER=24,np=Math.ceil(r.length/PER);st.page=Math.min(Math.max(1,st.page||1),np);
+  L.innerHTML=r.slice((st.page-1)*PER,st.page*PER).map(card).join("");
+  if(np>1){const cur=st.page,S=new Set([1,np,cur-1,cur,cur+1].filter(n=>n>=1&&n<=np));const ns=[...S].sort((a,b)=>a-b);let h=`<button class="pg" data-p="${cur-1}" ${cur===1?"disabled":""} aria-label="이전">‹</button>`,prev=0;
+   for(const n of ns){if(n-prev>1)h+='<span class="pg-gap">…</span>';h+=`<button class="pg${n===cur?" on":""}" data-p="${n}" ${n===cur?'aria-current="page"':""}>${n}</button>`;prev=n}
+   h+=`<button class="pg" data-p="${cur+1}" ${cur===np?"disabled":""} aria-label="다음">›</button>`;PG.innerHTML=h+`<span class="pg-info">${(cur-1)*PER+1}–${Math.min(cur*PER,r.length)} / ${r.length}건</span>`;
+   PG.querySelectorAll("button.pg").forEach(b=>b.onclick=()=>{st.page=+b.dataset.p;render(true);const y=document.getElementById("count").getBoundingClientRect().top+scrollY-90;window.scrollTo({top:y,behavior:"smooth"})})}
   L.querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)));
 }
 render();
