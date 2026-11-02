@@ -433,7 +433,7 @@ h1{font-size:clamp(34px,11.8vw,56px)!important}
   <div class="in">
     <div class="nav">
       <a class="brand" href="/"><span class="mark">bid</span>bid.archive</a>
-      <div class="navr"><a href="/">📊 적중 기록</a><div class="updated">마지막 업데이트 <b class="num">10.31 10:00</b><span class="src"><br>경매 대법원 · 실거래 국토부</span></div></div>
+      <div class="navr"><a href="/">📊 적중 기록</a><div class="updated">마지막 업데이트 <b class="num">__UPDATED__</b><span class="src"><br>경매 대법원 · 실거래 국토부</span></div></div>
     </div>
     <div class="hgrid"><div class="headline">
       __TABS__
@@ -505,7 +505,7 @@ h1{font-size:clamp(34px,11.8vw,56px)!important}
 <script>
 (()=>{
 const SCORE={total:8,done:0,hit:0};
-const TODAY=new Date("2026-10-30T00:00:00");
+const TODAY=(()=>{const t=new Date(Date.now()+9*36e5);return new Date(t.toISOString().slice(0,10)+"T00:00:00")})();
 const DATA=__DATA__;
 const PRICES=[["금액 전체",0,Infinity],["1억↓",0,1e8],["1~2억",1e8,2e8],["2~4억",2e8,4e8],["4억↑",4e8,Infinity]];
 const SIZES=[["평형 전체",0,999],["~12평",0,40],["12~20평",40,65],["25평대",65,100],["30평↑",100,999]];
@@ -551,7 +551,7 @@ $("picks").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.fin
 /* filters */
 /* hot */
 const gap=x=>x.last?x.last[2]-x.min:(x.mkt?x.mkt-x.min:0);
-const hotList=DATA.filter(x=>x.cand||x.rec).filter(x=>gap(x)>0).sort((a,b)=>gap(b)-gap(a));
+const hotList=DATA.filter(x=>x.cand||x.rec).filter(x=>gap(x)>0&&days(x.date)>=0).sort((a,b)=>a.date.localeCompare(b.date)||gap(b)-gap(a));
 if($("hMax"))$("hMax").textContent=eok(Math.max(...DATA.filter(x=>x.cand||x.rec).map(gap)));
 $("hots").innerHTML=hotList.filter(x=>x.cand).map((x,i)=>`<article class="hot">
   <div class="hrank num">${i+1}</div>
