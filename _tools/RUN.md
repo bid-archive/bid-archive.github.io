@@ -23,7 +23,7 @@ curl -fsS https://raw.githubusercontent.com/bid-archive/bid-archive.github.io/ma
 
 ## 2. 빌드·게시 (컨테이너)
 setup.sh 다시 실행(새 src 받기) → `cd /home/claude/busan && for r in busan seoul gyeonggi daejeon; do python3 gen.py $r; python3 build.py $r; done`
-→ GitHub upload/main/<region> 에 `/home/claude/busan/ghsite/<region>/index.html` 업로드·커밋(파일 입력에 file_upload) → 1~2분 뒤 bid-archive.github.io/<region>/ 반영 확인
+→ GitHub upload/main/<region> 에 `/home/claude/busan/ghsite/<region>/index.html`와 `stats.json`(첫 화면 지역 현황·곧 매각 추천용) 두 파일을 한 번에 업로드·커밋(파일 입력에 file_upload) → 1~2분 뒤 bid-archive.github.io/<region>/ 반영 확인
 
 ## 3. 보고 (SendUserMessage, 개조식)
 지역별: 전체 / 신규 / 빠진 물건 / 판정 집계 / 🔥 추천 변동(gen.py 출력) / 인수 위험 신건 / 실패·미확인

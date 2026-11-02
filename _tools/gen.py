@@ -85,4 +85,13 @@ for x in D:
 TABS='<div class="regions" role="tablist" aria-label="지역">'+''.join((f'<a class="rg on" href="/{k}/" aria-current="page">{v["name"]}</a>' if k==REG else f'<a class="rg" href="/{k}/">{v["name"]}</a>') for k,v in json.load(open('/home/claude/busan/regions.json')).items())+'</div>'
 html=pathlib.Path('/home/claude/busan/page.html').read_text().replace('__TABS__',TABS).replace('__UPDATED__',__import__('datetime').datetime.fromtimestamp(os.path.getmtime('src/cases.json'),__import__('datetime').timezone(__import__('datetime').timedelta(hours=9))).strftime('%m.%d %H:%M')).replace('__REQ__',(f'<div class="reqchip">누적 의뢰 <b>{TK["total"]:,}</b>건 · 사건당 1명</div>' if TK['total']>=TK.get('show_from',30) else '')).replace('__REGION__',CFG['name']).replace('__DRAFT__',CFG['draft']).replace('__COURTN__',json.dumps(CFG['courtn'],ensure_ascii=False)).replace('__CENTER__',CFG['center']).replace('__DISC__',str(round(CFG.get('disc',.2)*100))).replace('__DATA__',json.dumps(D,ensure_ascii=False)).replace('__N__',str(len(D)))
 pathlib.Path(CFG['out']).write_text(html)
+def _gap(x):
+    lp=x['last'][2] if x.get('last') else x.get('mkt')
+    return (lp-x['min']) if lp else 0
+_today=__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=9))).strftime('%Y-%m-%d')
+_soon=sorted([x for x in D if x['cand'] and x['date']>=_today and _gap(x)>0],key=lambda x:(x['date'],-_gap(x)))[:6]
+STATS=dict(region=REG,name=CFG['name'],total=len(D),cand=sum(1 for x in D if x['cand']),updated=html.split('마지막 업데이트 <b class="num">')[1].split('<')[0] if '마지막 업데이트 <b class="num">' in html else '',
+  soon=[dict(pid=x['pid'],name=x['name'],gu=x['gu'],date=x['date'],min=x['min'],gap=_gap(x),py=round(x['m2']/3.3058) if x.get('m2') else None) for x in _soon])
+os.makedirs('/home/claude/busan/ghsite/'+REG,exist_ok=True)
+open('/home/claude/busan/ghsite/'+REG+'/stats.json','w').write(json.dumps(STATS,ensure_ascii=False))
 print(len(D), sum(x['cand'] for x in D), [x['name'] for x in D if x['cand']])
