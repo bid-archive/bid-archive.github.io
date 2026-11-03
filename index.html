@@ -176,8 +176,8 @@ body,p,h1,h2,span,div{word-break:keep-all;overflow-wrap:break-word}
     <div class="sec-h"><h2>적중 기록</h2><span class="note">예상낙찰가를 매각 전에 공개하고, 틀려도 지우지 않습니다</span></div>
     <div class="stats" style="margin-top:0">
       <div class="stat"><div class="k">누적 예측</div><div class="v" id="sTotal">0</div><div class="s" id="sTotalS">건</div></div>
-      <div class="stat"><div class="k">적중률 (±5%)</div><div class="v" id="sHit">–</div><div class="s" id="sHitS">결과 확인 0건</div></div>
-      <div class="stat"><div class="k">평균 오차</div><div class="v" id="sErr">–</div><div class="s">예상가 vs 낙찰가</div></div>
+      <div class="stat"><div class="k" id="sHitK">적중률 (±5%)</div><div class="v" id="sHit">–</div><div class="s" id="sHitS">결과 확인 0건</div></div>
+      <div class="stat"><div class="k" id="sErrK">평균 오차</div><div class="v" id="sErr">–</div><div class="s" id="sErrS">예상가 vs 낙찰가</div></div>
       <div class="stat"><div class="k">결과 대기</div><div class="v" id="sWait">0</div><div class="s">건</div></div>
     </div>
   </section>
@@ -231,26 +231,28 @@ const RECORDS = [
    minimum:288000000, market:390000000, predict:350000000, result:null, bidders:null, locked:false,
    cards:["5437-1.jpg","5437-2.jpg","5437-3.jpg"]},
   {region:"부산", court:"부산서부", case_no:"2025타경102229", title:"반도보라타운", area:"34평 · 2/22층", date:"2026-11-03",
-   minimum:119000000, market:180000000, predict:145000000, result:null, bidders:null, locked:false,
+   minimum:119000000, market:180000000, predict:145000000, result:140000000, bidders:4, locked:false,
    cards:["102229-1.jpg","102229-2.jpg","102229-3.jpg"]},
   {region:"경기", court:"수원", case_no:"2026타경49", title:"e편한세상오산세교", area:"34평 · 20/25층 · 1회 유찰", date:"2026-11-02",
    minimum:254100000, market:360000000, predict:290000000, result:324000000, bidders:null, locked:false,
    cards:["49-1.jpg","49-2.jpg","49-3.jpg"]},
-  {region:"서울", court:"서울북부", case_no:"2024타경113523", title:"오동공원현대홈타운", area:"34평 · 8층 · 불허가 후 재매각", date:"2026-11-03",
-   minimum:514400000, market:600000000, predict:550000000, result:null, bidders:null, locked:false,
+  {region:"서울", court:"서울북부", case_no:"2024타경113523", title:"오동공원현대홈타운", area:"34평 · 8층 · 작년 낙찰 후 불허가", date:"2026-11-03",
+   minimum:514400000, market:600000000, predict:550000000, result:null, bidders:null, status:"failed", next:"12.8", locked:false,
    cards:["113523-1.jpg","113523-2.jpg","113523-3.jpg"]},
   {region:"서울", court:"서울북부", case_no:"2025타경13779", title:"창동금호어울림", area:"34평 · 2층 · 신건", date:"2026-11-03",
-   minimum:820000000, market:890000000, predict:830000000, result:null, bidders:null, locked:false,
+   minimum:820000000, market:890000000, predict:830000000, result:null, bidders:null, status:"failed", next:"12.8", locked:false,
    cards:["13779-1.jpg","13779-2.jpg","13779-3.jpg"]},
   {region:"서울", court:"서울남부", case_no:"2026타경33", title:"신도림태영타운", area:"34평 · 15/21층 · 신건 유찰 후 다음 회차 예측", date:"2026-11-06",
    minimum:1400000000, market:1440000000, predict:1350000000, result:null, bidders:null, locked:false,
    cards:["33-1.jpg","33-2.jpg","33-3.jpg"]},
   {region:"서울", court:"서울북부", case_no:"2024타경112971", title:"전농동삼성래미안", area:"26평 · 5/20층", date:"2026-11-03",
-   minimum:612800000, market:1150000000, predict:1050000000, result:null, bidders:null, locked:false,
+   minimum:612800000, market:1150000000, predict:1050000000, result:970005320, bidders:15, locked:false,
    cards:["112971-1.jpg","112971-2.jpg","112971-3.jpg"]},
   {region:"서울", court:"서울북부", case_no:"2026타경10589", title:"중계그린", area:"15평 · 15/15층", date:"2026-11-03",
-   minimum:497600000, market:700000000, predict:590000000, result:null, bidders:null, locked:false,
+   minimum:497600000, market:700000000, predict:590000000, result:642246000, bidders:10, locked:false,
    cards:["10589-1.jpg","10589-2.jpg","10589-3.jpg"]},
+  {region:"서울", court:"서울북부", case_no:"2026타경10525", title:"공릉해링턴플레이스", area:"49평 · 9/15층 · 1회 유찰", date:"2026-11-03",
+   minimum:952000000, market:1130000000, predict:1090000000, result:null, bidders:null, locked:false, status:"failed", next:"12.8"},
 ];
 const HIT = 0.05;
 const TODAY = new Date(); TODAY.setHours(0,0,0,0);
@@ -260,6 +262,7 @@ const eok = v => {
   if (e >= 10) { const j = Math.floor(e), m = Math.round((v - j*1e8)/1e4); return m ? `${j}억 ${m.toLocaleString()}만` : `${j}억`; }
   return `${(Math.round(e*100)/100).toString()}억`;
 };
+const MIN_STAT = 10;
 const errOf = r => (r.result - r.predict) / r.result;
 const fmtDate = s => s.slice(2).replace(/-/g,".");
 const dday = s => { const d = Math.round((new Date(s+"T00:00:00") - TODAY)/864e5); return d > 0 ? `D-${d}` : d === 0 ? "D-DAY" : "결과 대기"; };
@@ -274,9 +277,19 @@ function renderStats(all){
   const hits = done.filter(r => Math.abs(errOf(r)) <= HIT);
   document.getElementById("sTotal").textContent = all.length;
   document.getElementById("sWait").textContent = all.filter(r => !r.result && !r.status).length;
-  document.getElementById("sHit").textContent = done.length ? Math.round(hits.length/done.length*100) + "%" : "–";
-  document.getElementById("sHitS").textContent = `결과 확인 ${done.length}건 중 ${hits.length}건`;
-  document.getElementById("sErr").textContent = done.length ? (done.reduce((s,r)=>s+Math.abs(errOf(r)),0)/done.length*100).toFixed(1) + "%" : "–";
+  const failed = all.filter(r => r.status === "failed").length;
+  if (done.length < MIN_STAT){
+    document.getElementById("sHitK").textContent = "결과 공개";
+    document.getElementById("sHit").textContent = (done.length + failed) + "건";
+    document.getElementById("sHitS").textContent = `낙찰 ${done.length} · 유찰 ${failed} · 표에 전부 공개`;
+    document.getElementById("sErrK").textContent = "적중률·평균 오차";
+    document.getElementById("sErr").textContent = `${MIN_STAT}건부터`;
+    document.getElementById("sErrS").textContent = `지금 낙찰 결과 ${done.length}건 · 쌓이면 공개`;
+  } else {
+    document.getElementById("sHit").textContent = Math.round(hits.length/done.length*100) + "%";
+    document.getElementById("sHitS").textContent = `결과 확인 ${done.length}건 중 ${hits.length}건`;
+    document.getElementById("sErr").textContent = (done.reduce((s,r)=>s+Math.abs(errOf(r)),0)/done.length*100).toFixed(1) + "%";
+  }
 }
 
 function renderUpcoming(all){
@@ -312,6 +325,7 @@ function renderRows(all){
     let res = `<span class="pill wait">결과 대기</span>`, err = "–";
     if (r.status === "changed") res = `<span class="pill wait">기일 변경</span>`;
     else if (r.status === "withdrawn") res = `<span class="pill wait">취하</span>`;
+    else if (r.status === "failed") res = `<span class="pill wait">유찰 · ${r.next||'다음 기일'} 재예측</span>`;
     else if (r.result){
       const e = errOf(r); const hit = Math.abs(e) <= HIT;
       res = `<span class="pill ${hit?'hit':'miss'}">${hit?'적중':'빗나감'}</span>`;
@@ -322,7 +336,7 @@ function renderRows(all){
       <td class="case">${r.court} ${r.case_no}</td>
       <td class="r num">${eok(r.minimum)}</td><td class="r big pk">${r.locked&&!r.result?'🔒':eok(r.predict)}</td>
       <td class="r big">${r.result?eok(r.result):'–'}</td><td class="r num">${err}</td>
-      <td class="r num">${r.bidders?r.bidders+'명':'–'}</td><td>${res}</td></tr>`;
+      <td class="r num">${r.bidders?r.bidders+'명':(r.status==='failed'?'0명':'–')}</td><td>${res}</td></tr>`;
   }).join("");
 }
 
