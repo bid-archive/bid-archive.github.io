@@ -17,9 +17,9 @@ for l in open('src/rent.txt'):
     R[c]=(J,W)
 def enrich(x):
     case=x['case']; fl=x.get('fl')
-    tra=T.get(case,[])
+    tra=T.get(x['pid'],[])
     tr=[t for t in tra if not t[4]]
-    if case in R: x['jr'],x['wr']=R[case]
+    if x['pid'] in R: x['jr'],x['wr']=R[x['pid']]
     sizes={t[3] for t in tr if t[3]}
     mixed=bool(sizes) and max(sizes)-min(sizes)>3
     x['tr']=[[t[0],t[1],t[2],t[3]]+([1] if t[4] else []) if (t[3] or t[4]) else [t[0],t[1],t[2]] for t in tra]; x['mixed']=mixed; x['mktN']=len(tr); x['dirN']=len(tra)-len(tr)
@@ -60,8 +60,6 @@ for c in SRC:
            addr=f"{c.get('sido') or CFG['name']} {c['gu']} {c['dong']} {c['lot']}",mkt=None,mktN=0,conf=False,tr=[],rec=False,pred=None)
     if c.get('nv'): x['nv']=c['nv']
     x['by']=BY.get(c['sg']+':'+c['dong']+'|'+c['lot']) or (str(c['use']) if c.get('use') else None)
-    T.setdefault(case,T.pop(c['pid'],[]));
-    if c['pid'] in R: R[case]=R.pop(c['pid'])
     enrich(x)
     x['tr']=x['tr'][:40]
     if x.get('jr'): x['jr']=x['jr'][:30]
