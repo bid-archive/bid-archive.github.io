@@ -457,7 +457,7 @@ h1{font-size:clamp(34px,11.8vw,56px)!important}
   <div class="in">
     <div class="nav">
       <a class="brand" href="/"><span class="mark">bid</span>bid.archive</a>
-      <div class="navr"><a href="/">📊 적중 기록</a><div class="updated">마지막 업데이트 <b class="num">11.03 16:14</b><span class="src"><br>경매 대법원 · 실거래 국토부</span></div></div>
+      <div class="navr"><a href="/">📊 적중 기록</a><div class="updated">마지막 업데이트 <b class="num">11.01 18:30</b><span class="src"><br>경매 대법원 · 실거래 국토부</span></div></div>
     </div>
     <div class="hgrid"><div class="headline">
       <div class="regions" role="tablist" aria-label="지역"><a class="rg" href="/seoul/">서울</a><a class="rg" href="/gyeonggi/">경기·인천</a><a class="rg on" href="/daejeon/" aria-current="page">대전</a><a class="rg" href="/busan/">부산</a></div>
@@ -537,7 +537,7 @@ const $=id=>document.getElementById(id);
 const eok=v=>{if(v==null)return"—";if(v<1e8)return Math.round(v/1e4).toLocaleString()+"만";const e=v/1e8;return (e>=10?e.toFixed(1):e.toFixed(2)).replace(/\.?0+$/,"")+"억"};
 const won=v=>{if(v==null)return"—";const e=Math.floor(v/1e8),m=Math.round(v%1e8/1e4);return (e?e+"억 ":"")+(m?m.toLocaleString()+"만":"")||"0"};
 const days=d=>Math.round((new Date(d+"T00:00:00")-TODAY)/864e5);
-const dlabel=d=>{const n=days(d);return n===0?"D-day":"D-"+n};
+const dlabel=d=>{const n=days(d);return n<0?"매각 종료":n===0?"D-day":"D-"+n};
 const md=d=>{const t=new Date(d+"T00:00:00");return (t.getMonth()+1)+"."+t.getDate()+" ("+WK[t.getDay()]+")"};
 const eff=x=>Math.max(x.min,x.burden||0);
 const disc=x=>x.mkt?Math.round((1-eff(x)/x.mkt)*100):null;
@@ -545,12 +545,12 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const kmap=x=>"https://map.kakao.com/link/search/"+encodeURIComponent(x.addr);
 
 /* hero */
-$("hTotal").textContent=DATA.length;$("ctaN").textContent=DATA.length;
+$("hTotal").textContent=DATA.filter(x=>days(x.date)>=0).length;$("ctaN").textContent=DATA.filter(x=>days(x.date)>=0).length;
 const ds=DATA.map(disc).filter(v=>v!=null&&v>0);
 const soon=DATA.filter(x=>days(x.date)<=7).length;
 if($("stats"))$("stats").innerHTML=[["누적 예측",SCORE.total,"건"],["적중률 (±3%)",SCORE.done?Math.round(SCORE.hit/SCORE.done*100)+"%":"채점 중",SCORE.done?SCORE.done+"건 채점":"첫 결과 11.2~"],["이번 주 ✅ bid PICK",DATA.filter(x=>x.rec).length,"건"],["부산 진행 경매",DATA.length,"건"]]
   .map(([k,v,u])=>`<div class="stat"><small>${k}</small><b>${v}<em>${u}</em></b></div>`).join("");
-const dayList=[...new Set(DATA.map(x=>x.date))].sort();
+const dayList=[...new Set(DATA.filter(x=>days(x.date)>=0).map(x=>x.date))].sort();
 function drawDays(){$("days").innerHTML=[`<button class="day" data-d="" aria-pressed="${!st.day}"><small>매각기일</small><span>전체</span></button>`]
   .concat(dayList.map(d=>`<button class="day" data-d="${d}" aria-pressed="${st.day===d}"><small>${md(d)}</small><span>${DATA.filter(x=>x.date===d).length}건</span></button>`)).join("");
   $("days").querySelectorAll(".day").forEach(b=>b.onclick=()=>{st.day=b.dataset.d;drawDays();render()})}
@@ -586,7 +586,7 @@ $("hots").querySelectorAll(".open").forEach(b=>b.onclick=()=>openSheet(DATA.find
 /* hero panel */
 (()=>{const hp=$("hpanel");if(!hp)return;const nc=DATA.filter(x=>x.cand).length,sn=DATA.filter(x=>days(x.date)<=7&&days(x.date)>=0).length;
 const top=DATA.filter(x=>x.cand&&days(x.date)>=0&&gap(x)>0).sort((a,b)=>a.date.localeCompare(b.date)||gap(b)-gap(a)).slice(0,4);
-hp.innerHTML=`<div class="hp-st"><div><small>진행 경매</small><b>${DATA.length.toLocaleString()}<i>건</i></b></div><div><small>🔥 추천</small><b>${nc}<i>건</i></b></div><div><small>7일 내 매각</small><b>${sn}<i>건</i></b></div></div>`+
+hp.innerHTML=`<div class="hp-st"><div><small>진행 경매</small><b>${DATA.filter(x=>days(x.date)>=0).length.toLocaleString()}<i>건</i></b></div><div><small>🔥 추천</small><b>${nc}<i>건</i></b></div><div><small>7일 내 매각</small><b>${sn}<i>건</i></b></div></div>`+
 (top.length?`<div class="hp-h"><span>곧 매각되는 추천 물건</span><span>최근 거래가 대비</span></div><div class="hp-l">${top.map(x=>`<button class="hp-r" data-case="${x.case}"><span class="dd2">${dlabel(x.date)}</span><span class="nm"><b>${esc(x.name)}</b><small>${x.gu}${x.m2?" · "+Math.round(x.m2/3.3058)+"평":""}</small></span><span class="sv">-${eok(gap(x))}</span></button>`).join("")}</div>`:"");
 hp.querySelectorAll(".hp-r").forEach(b=>b.onclick=()=>openSheet(DATA.find(x=>x.case===b.dataset.case)))})();
 
@@ -853,14 +853,14 @@ async function drawPins(r){
 function render(keep){
   if(!keep)st.page=1;
   const p0=st.pmin||0,p1=st.pmax||Infinity,[,s0,s1]=SIZES[st.size],f0=FAILS[st.fail][1],q=st.q.toLowerCase();
-  let r=DATA.filter(x=>(!st.gu||x.gu===st.gu)&&(!st.day||x.date===st.day)&&x.min>=p0&&x.min<p1
+  let r=DATA.filter(x=>days(x.date)>=0&&(!st.gu||x.gu===st.gu)&&(!st.day||x.date===st.day)&&x.min>=p0&&x.min<p1
     &&(st.size===0||(x.m2&&x.m2>=s0&&x.m2<s1))&&(f0<0||(f0===0?x.fail===0:(x.fail||0)>=f0))
     &&(st.pick===0||(st.pick===1?(x.cand||x.rec):x.rec))
     &&(!q||(x.name+x.dong+x.gu+x.case+x.ho).toLowerCase().includes(q))
     &&(!st.seed||seedGap(x)>=0));
   r.sort(st.sort==="date"?(a,b)=>a.date.localeCompare(b.date)||(b.rec-a.rec)||(b.cand-a.cand)||((disc(b)??-99)-(disc(a)??-99))
     :st.sort==="disc"?(a,b)=>(disc(b)??-99)-(disc(a)??-99):(a,b)=>a.min-b.min);
-  $("count").innerHTML=`<b>${r.length}</b>건 표시 · 전체 ${DATA.length}건`+(st.seed?` · <span class="seedok">💰 내 현금 ${eok(st.seed.eq)}으로 가능</span>`:"");
+  $("count").innerHTML=`<b>${r.length}</b>건 표시 · 전체 ${DATA.filter(x=>days(x.date)>=0).length}건`+(st.seed?` · <span class="seedok">💰 내 현금 ${eok(st.seed.eq)}으로 가능</span>`:"");
   const L=$("list");
   $("bigmap").hidden=st.view!=="map";L.hidden=st.view==="map";
   const PG=$("pager");PG.innerHTML="";
