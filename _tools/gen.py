@@ -96,7 +96,7 @@ def _gap(x):
     return (lp-x['min']) if lp else 0
 _today=__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=9))).strftime('%Y-%m-%d')
 _soon=sorted([x for x in D if x['cand'] and x['date']>=_today and _gap(x)>0],key=lambda x:(x['date'],-_gap(x)))[:6]
-STATS=dict(region=REG,name=CFG['name'],total=len(D),cand=sum(1 for x in D if x['cand']),updated=html.split('마지막 업데이트 <b class="num">')[1].split('<')[0] if '마지막 업데이트 <b class="num">' in html else '',
+STATS=dict(region=REG,name=CFG['name'],total=sum(1 for x in D if x['date']>=_today),cand=sum(1 for x in D if x['cand']),updated=html.split('마지막 업데이트 <b class="num">')[1].split('<')[0] if '마지막 업데이트 <b class="num">' in html else '',
   soon=[dict(pid=x['pid'],name=x['name'],gu=x['gu'],date=x['date'],min=x['min'],gap=_gap(x),py=round(x['m2']/3.3058) if x.get('m2') else None) for x in _soon])
 os.makedirs('/home/claude/busan/ghsite/'+REG,exist_ok=True)
 # --- 모델 예측 기록 (매각 전에 남겨 두고, 결과와 비교) ---
