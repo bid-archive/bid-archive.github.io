@@ -67,11 +67,11 @@ a{color:inherit}
 .case{font-size:12px;color:var(--sub)}
 .uc h3{margin:0;font-size:19px;font-weight:900;letter-spacing:-.02em}
 .uc .meta{font-size:13px;color:var(--sub)}
-.ladder{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.ladder div{padding:10px 8px;text-align:center;border-left:1px solid var(--line)}
-.ladder div:first-child{border-left:none}
-.ladder .k{font-size:11px;color:var(--sub)}
-.ladder .v{font-family:var(--f-display);font-size:21px;line-height:1.3}
+.ladder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ladder>div{padding:10px 4px;text-align:center;border-left:1px solid var(--line);min-width:0}
+.ladder>div:first-child{border-left:none}
+.ladder .k{font-size:11px;color:var(--sub);white-space:nowrap}
+.ladder .v{font-family:var(--f-display);font-size:clamp(17px,5.4vw,21px);line-height:1.3;white-space:nowrap}
 .ladder .pick{background:var(--lime);color:var(--on-lime)}
 .ladder .pick .k{color:var(--on-lime);opacity:.75}
 .lock{filter:blur(6px);user-select:none}
@@ -227,6 +227,18 @@ body,p,h1,h2,span,div{word-break:keep-all;overflow-wrap:break-word}
 <script>
 /* 데이터: 결과가 나오면 result(원), bidders(명)만 채우면 됩니다. status: 'changed'(기일 변경)·'withdrawn'(취하) */
 const RECORDS = [
+  {region:"부산", court:"부산", case_no:"2026타경10642", title:"양정현대", area:"18평 · 19층 · 1회 유찰", date:"2026-11-09",
+   minimum:226100000, market:300000000, predict:275000000, result:null, bidders:null, locked:false,
+   cards:["10642-1.jpg"]},
+  {region:"부산", court:"부산동부", case_no:"2025타경5504", title:"해운대 에스케이뷰", area:"18평 · 17층 · 1회 유찰", date:"2026-11-09",
+   minimum:179200000, market:255000000, predict:230000000, result:null, bidders:null, locked:false,
+   cards:["5504-1.jpg"]},
+  {region:"부산", court:"부산서부", case_no:"2025타경101289", title:"화명 롯데낙천대", area:"18평 · 9층 · 1회 유찰", date:"2026-11-10",
+   minimum:250600000, market:395000000, predict:330000000, result:null, bidders:null, locked:false,
+   cards:["101289-1.jpg"]},
+  {region:"부산", court:"부산서부", case_no:"2023타경104875", title:"하단 가락타운", area:"34평 · 14층 · 2회 유찰", date:"2026-11-10",
+   minimum:164640000, market:256000000, predict:230000000, result:null, bidders:null, locked:false,
+   cards:["104875-1.jpg"]},
   {region:"부산", court:"부산", case_no:"2025타경5437", title:"안락SK뷰", area:"34평 · 13/25층 · 1회 유찰", date:"2026-11-06",
    minimum:288000000, market:390000000, predict:350000000, result:376153000, bidders:11, locked:false,
    cards:["5437-1.jpg","5437-2.jpg","5437-3.jpg"]},
